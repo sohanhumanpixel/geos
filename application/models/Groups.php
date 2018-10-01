@@ -94,5 +94,27 @@ class Groups extends CI_Model {
 		return $this->db->delete('groups');
 		
     }
+	
+	/**
+	 *getEmpGroup
+	 */
+	function getEmpGroup($empId){
+		$this->db->select('id, group_name');
+        $this->db->from('groups');
+        $this->db->where('created_by', $empId);
+        $query = $this->db->get();
+        return $query->result();
+	}
+	
+	/**
+	 *Count employee Group
+	 */
+	 function countEmpGroup($empId){
+		$this->db->select('id');
+        $this->db->from('groups');
+        $this->db->where('created_by', $empId);
+        $query = $this->db->get();
+        return count($query->result());
+	}
 }
 ?>
