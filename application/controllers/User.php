@@ -14,6 +14,11 @@ Class User extends CI_Controller {
 		$this->load->library('session');
 	}
 	public function index() {
+		//if already loggedin
+		$isLoggedIn = $this->session->userdata ( 'logged_in' );
+		if (isset ( $isLoggedIn['isLoggedIn'] ) || $isLoggedIn['isLoggedIn'] == TRUE) {
+			redirect ( 'dashboard' );
+		}
 		$this->load->view('users/login');
 		
 	}
