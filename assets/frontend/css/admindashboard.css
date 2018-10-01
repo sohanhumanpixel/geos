@@ -11,26 +11,6 @@ body {
   margin-right: 0px !important;
   margin-top: 30px;
 }
-
-#productDescription_feature_div {
-  width:100%!important;
-  }
-
-span.details_span{
-	font-size: 18px;
-    font-weight: 700;
-}
-.mycontent-row {
-  border-bottom: 1px solid #333;
-  padding: 8px 5px;
-  margin: 0px !important;
-}
-img.img-rounded {
-    float: left;
-    width: 200px;
-    height: 200px;
-}
-
 /* Logo & Navigation */
 
 .header{
@@ -565,11 +545,6 @@ body {
 
 /* Responsive CSS */
 
-/* Mobile phones */
-@media (max-width: 480px){
-
-}
-
 /* Tablets */
 @media (max-width: 767px){
    .container{
@@ -633,22 +608,6 @@ body {
       border-radius:10px;
    }  
 }
-.container-img{
-	position: relative;
-	display: inline-block;
-}
-.container-img:hover .delete_img {
-	display: block;
-}
-.delete_img {
-	padding-right: 7px;
-	position: absolute;
-	right: 0;
-	top: -3px;
-	display: none;
-	font-weight: 700;
-    font-size: 23px;
-}
 .drop_downform {
     float: left;
     width: 100%;
@@ -670,4 +629,13 @@ em {
 	max-height: 200px;
     overflow-x: hidden;
     overflow-y: auto;
+}
+.small-box.bg-aqua {
+    background-color: #00c0ef !important;
+}
+.small-box>.inner {
+    padding: 10px;
+}
+.bg-green{
+	background-color: #00a65a;
 }
