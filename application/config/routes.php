@@ -62,6 +62,6 @@ $route['forgot_password'] = 'User/forgot_password';
 $route['UserGroups/grouplist/(:num)'] = "UserGroups/grouplist/$1";
 $route['UserGroups/grouplist'] = "UserGroups/grouplist";
 /** Employees Dashboard*/
-
+$route['Employee/dashboard'] = "Employee/index";
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
