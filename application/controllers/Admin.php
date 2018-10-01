@@ -28,15 +28,20 @@ Class Admin extends BaseController {
  *@date: 28-09-2018
 */ 
  public function userListing(){
-	 $this->load->model('users');
-	 $this->load->library('pagination');
-	 $searchText = '';
-	 $count = $this->users->userListingCount($searchText);
-	 $returns = $this->paginationCompress ( "employee_list/", $count, 1 );
-	 $data['userRecords'] = $this->users->userListing($searchText, $returns["page"], $returns["segment"]);
-	 $data['title'] = 'User List';
-	$this->load->view('includes/header',$data);
-	$this->load->view('admin/user_list');
+	 if($this->isAdmin() == TRUE)
+        {
+            $this->loadThis();
+        }else{
+			$this->load->model('users');
+			$this->load->library('pagination');
+			$searchText = '';
+			$count = $this->users->userListingCount($searchText);
+			$returns = $this->paginationCompress ( "employee_list/", $count, 1 );
+			$data['userRecords'] = $this->users->userListing($searchText, $returns["page"], $returns["segment"]);
+			$data['title'] = 'User List';
+			$this->load->view('includes/header',$data);
+			$this->load->view('admin/user_list');
+		}
  }
  
  
