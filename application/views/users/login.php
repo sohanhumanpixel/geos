@@ -14,8 +14,7 @@
   <nav class="navbar navbar-default navbar-fixed-top">
   <div class="container">
     <div class="navbar-header">
-      
-      <a class="navbar-brand" href="JavaScript:void(0);">LOGO</a>
+      <img src="<?php echo base_url();?>assets/images/logo.png" style="padding:2px; height:60px;" />
     </div>
   </div>
 </nav>
