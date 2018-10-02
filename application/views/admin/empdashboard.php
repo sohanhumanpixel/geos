@@ -5,7 +5,7 @@
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
-						<h3>Welcome to Your Intranet!!</h3>
+						<h3>Geosurv Intranet Dashboard</h3>
 					</div>
 				</div>
 				<div class="panel-body">
