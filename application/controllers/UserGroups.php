@@ -32,7 +32,7 @@ class UserGroups extends BaseController {
 			$this->load->library('pagination');
 			$searchText = '';
 			$count = $this->groups->groupListingCount($searchText);
-			$returns = $this->paginationCompress ( "UserGroups/grouplist", $count, 2 );
+			$returns = $this->paginationCompress ( "UserGroups/grouplist", $count, 10 );
 			$data['groupRecords'] = $this->groups->GroupListing($searchText, $returns["page"], $returns["segment"]);
 			$this->load->view('includes/header',$data);
 			$this->load->view('UserGroups/admin_group_list');
