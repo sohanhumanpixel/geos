@@ -36,7 +36,7 @@ Class Admin extends BaseController {
 			$this->load->library('pagination');
 			$searchText = '';
 			$count = $this->users->userListingCount($searchText);
-			$returns = $this->paginationCompress ( "employee_list/", $count, 1 );
+			$returns = $this->paginationCompress ( "employee_list/", $count, 10 );
 			$data['userRecords'] = $this->users->userListing($searchText, $returns["page"], $returns["segment"]);
 			$data['title'] = 'User List';
 			$this->load->view('includes/header',$data);
