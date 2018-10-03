@@ -17,7 +17,7 @@ Class TimeSheet extends BaseController {
 		$this->isLoggedIn(); 
 	}
 	public function index() {
-			$this->taskList();
+			$this->listtimesheet();
 	}
 /**
  *@method name: userListing
@@ -26,17 +26,55 @@ Class TimeSheet extends BaseController {
  *@date: 01-10-2018
 */ 
  public function listtimesheet(){
-	 die('comming soon!!');
-	$this->load->model('users');
-	$this->load->library('pagination');
-	$searchText = '';
-	$count = $this->users->userListingCount($searchText);
-	$returns = $this->paginationCompress ( "employee_list/", $count, 1 );
-	$data['userRecords'] = $this->users->userListing($searchText, $returns["page"], $returns["segment"]);
-	$data['title'] = 'Task List';
+	$this->load->model('timesheetsModel');
+	$this->load->model('project_type');
+	
+	$data['title'] = 'Time List2';
+	$typedata = $this->project_type->getPList();
+	
+	//echo '<pre>';
+	//print_r($typedata);
+	//print_r($allEmp);
+	$data['ptypedata'] = $typedata;
 	$this->load->view('includes/header',$data);
-	$this->load->view('admin/employee_task_list');
+	$this->load->view('timesheet/timesheettemplate');
  }
+ 
+ /**
+  *this function called into view 
+  */
+ function getEmployee($type_id){
+	$startdate = date('Y-m-d');
+	$enddate = date('Y-m-d', strtotime("+7 day"));
+	//$query = $this->db->query("SELECT DISTINCT(employee_id) FROM timesheets WHERE project_id=$type_id AND (date >= '$startdate' AND date <= '$enddate')");
+	$emprole = ROLE_EMPLOYEE;
+	$query = $this->db->query("SELECT id as userId, fname,lname FROM users WHERE role_id=$emprole");
+	$useIdss = $query->result_array();
+	
+	//Now going to fetch user and their data form time sheet
+	$allData = array();
+	if(!empty($useIdss)){
+		foreach($useIdss as $k=>$userval){
+			$allEmp = $this->timesheetsModel->getSheetData($type_id, $userval['userId'], $startdate,$enddate);
+			//$singleUser = $this->__singleUser($userval['employee_id']);
+			$allData[$k]['userData'] = $userval;
+			$allData[$k]['userTimeSheetData'] = $allEmp;
+			//print_r($allEmp);
+			//print_r($singleUser);
+		}
+		
+	}
+	return $allData;
+}
+/**
+ *@get Single User data
+ *@scope fo this function -- Private
+ */
+private function __singleUser($userId){
+	$singleUquery = $this->db->query("SELECT id as userid, fname, lname from users WHERE id=$userId");
+	$singleU = $singleUquery->result_array();
+	return $singleU;
+}
  
  /*
   *@method name: grouplist
