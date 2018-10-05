@@ -73,7 +73,7 @@ class UserGroups extends BaseController {
 		{
 			$group_name = $this->input->post('group_name');
 			
-			$userInfo = array('group_name'=>$group_name,'created_by'=>$this->vendorId, 'created_at'=>date('Y-m-d H:i:s'));
+			$userInfo = array('group_name'=>$group_name, 'created_at'=>date('Y-m-d H:i:s'));
 			
 			$this->load->model('groups');
 			$result = $this->groups->addNewGroup($userInfo);
