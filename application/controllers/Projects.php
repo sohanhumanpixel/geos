@@ -23,117 +23,154 @@ Class Projects extends BaseController {
 	 */
 	 
 	public function index() {
-			$this->ProjectList();
-	}
-/**
- *@method name: userListing
- *@other method: userListingCount, userListing  - both method exist into users model
- *@ Author: Human Pixel
- *@date: 01-10-2018
-*/ 
- public function ProjectList(){
-	$this->load->model('users');
-	$this->load->library('pagination');
-	$data['title'] = 'Project List';
-	die('project List');
-	
-	$searchText = '';
-	$count = $this->users->userListingCount($searchText);
-	$returns = $this->paginationCompress ( "employee_list/", $count, 1 );
-	$data['userRecords'] = $this->users->userListing($searchText, $returns["page"], $returns["segment"]);
-	$data['title'] = 'Project List';
-	$this->load->view('includes/header',$data);
-	$this->load->view('admin/employee_task_list');
- }
- 
- /*
-  *@method name: grouplist
-  *@author: Human Pixel
-  *@create date: 01-10-2018
-  */
- public function grouplist(){
-	$userLogin = $this->session->userdata ( 'logged_in' );
-	$this->load->model('groups');
-	$data['empGroupData'] = $this->groups->getEmpGroup($userLogin['user_id']);
-	$data['title'] = 'Employee Group';
-	$this->load->view('includes/header',$data);
-	$this->load->view('admin/employee_glist');	
- }
- 
- /**
-  * @method:ajax_checkEmailExists
-  * @purpose: check duplicacy of user email on registration/edit page
-  * model used: users
-  */
-  
- public function ajax_checkEmailExists(){
-		$userId = $this->input->post("userId");
-       $email = $this->input->post("email");
-		$this->load->model('users');
-        if(empty($userId)){
-            $result = $this->users->checkEmailExists($email);
-        } else {
-            $result = $this->users->checkEmailExists($email, $userId);
-        }
-        if(empty($result)){
-			echo("true"); 
-			}
-        else { echo("false"); }
- }
- 
- /**
-  * @method:ajax_checkUsernameExists
-  * @purpose: check duplicacy of username on registration/edit page
-  * model used: users
-  */
- public function ajax_checkUsernameExists(){
-	 $userId = $this->input->post("userId");
-       $username = $this->input->post("username");
-		$this->load->model('users');
-        if(empty($userId)){
-            $result = $this->users->checkUsernameExists($username);
-        } else {
-            $result = $this->users->checkUsernameExists($username, $userId);
-        }
-        if(empty($result)){
-			echo("true"); 
-			}
-        else { echo("false"); }
- }
- 
- /**
-    * This function is used to delete the user using userId
-    * @return boolean $result : TRUE / FALSE
-  */
-    public function ajax_deleteUser()
-    {
-        if($this->isAdmin() == TRUE)
+		if($this->isTicketter() == TRUE)
         {
-            echo(json_encode(array('status'=>'access')));
+            $this->loadThis();
+        }else
+        {
+        	$this->load->model('project_type');
+            $this->load->library('pagination');
+            $searchText = '';
+            $count = $this->project_type->projectCount($searchText);
+            $returns = $this->paginationCompress ( "Projects", $count, 10 );
+            $data['projects'] = $this->project_type->getProjects($searchText, $returns["page"], $returns["segment"]);
+			$data['title'] = 'Projects';
+			$this->load->view('includes/header',$data);
+			$this->load->view('projects/projects');
+        }
+	}
+    public function add(){
+		if($this->isTicketter() == TRUE)
+        {
+            $this->loadThis();
+        }else
+        {
+        	$this->load->model('project_type');
+        	$this->load->model('clients');
+        	$data['project_types'] = $this->project_type->getPList();
+        	$data['clients'] = $this->clients->getAllClients();
+        	$data['inductions'] = $this->project_type->getInductions();
+        	$data['title'] = 'Add New Project';
+			$this->load->view('includes/header',$data);
+			$this->load->view('projects/add_project');
+        }
+	}
+	public function addAction(){
+		if($this->isTicketter() == TRUE)
+        {
+            $this->loadThis();
+        }else
+        {
+        	$this->load->library('form_validation');
+        	$this->form_validation->set_rules('project_name','Project Name','trim|required|max_length[128]');
+        	$this->form_validation->set_rules('client_name','Client Name','required');
+        	$this->form_validation->set_rules('site_address','Project Site Address','trim|required');
+        	$this->form_validation->set_rules('induction[]','Online Induction','trim|required');
+        	$this->form_validation->set_rules('project_type[]','Project Type','trim|required');
+        	if($this->form_validation->run() == FALSE)
+            {
+                $this->add();
+            }
+            else
+            {
+            	$project_name = $this->input->post('project_name');
+                $client_id = $this->input->post('client_name');
+                $site_address = $this->input->post('site_address');
+                $induction_instruction = $this->input->post('induction_instruction');
+                $project_type = implode(',', $this->input->post('project_type'));
+                $project_code = mt_rand(100000, 999999);
+                $induction = implode(',', $this->input->post('induction'));
+                $data = array('project_name'=>$project_name,'client_id'=>$client_id,'project_type'=>$project_type,'induction'=>$induction,'instructions'=>$induction_instruction,'project_manager_id'=>$this->vendorId,'project_code'=>$project_code,'project_address'=>$site_address,'created_date'=>date('Y-m-d H:i:s'));
+                $this->load->model('project_type');
+                $result = $this->project_type->addNewProject($data);
+                if($result > 0)
+                {
+                    $this->session->set_flashdata('success', 'New Project created successfully');
+					redirect('projects');
+                }
+                else
+                {
+                    $this->session->set_flashdata('error', 'Project creation failed');
+					redirect('projects/add');
+                }
+            }
+        }
+	}
+	public function edit($projectId = NULL){
+        if($this->isTicketter() == TRUE)
+        {
+            $this->loadThis();
+        }else{
+			if($projectId == null)
+            {
+                redirect('projects');
+            }
+			$this->load->model('project_type');
+			$this->load->model('clients');
+			$data['project_types'] = $this->project_type->getPList();
+        	$data['clients'] = $this->clients->getAllClients();
+        	$data['inductions'] = $this->project_type->getInductions();
+			$project_data = $this->project_type->getProjectById(convert_uudecode(base64_decode($projectId)));
+			if(empty($project_data)){
+				  redirect('projects');
+			}
+			$data['projectInfo'] = $project_data;
+			$data['title'] = 'Edit Project';
+			$this->load->view('includes/header',$data);
+			$this->load->view('projects/edit_project');
+		}
+	}
+
+	public function editAction()
+    {
+        if($this->isTicketter() == TRUE)
+        {
+            $this->loadThis();
         }
         else
         {
-			$this->load->model('users');
-            $userId = $this->input->post('userId');
-            $userInfo = array('isDeleted'=>1,'updatedBy'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
-            $result = $this->users->deleteUser($userId, $userInfo);
-           if ($result > 0) {
-			   echo(json_encode(array('status'=>TRUE)));
-			   }else{
-				   echo(json_encode(array('status'=>FALSE))); 
-				}
+            $this->load->library('form_validation');
+			$project_id = $this->input->post('project_id');
+            
+            $this->form_validation->set_rules('project_name','Project Name','trim|required|max_length[128]');
+        	$this->form_validation->set_rules('client_name','Client Name','required');
+        	$this->form_validation->set_rules('site_address','Project Site Address','trim|required');
+        	$this->form_validation->set_rules('induction[]','Online Induction','trim|required');
+        	$this->form_validation->set_rules('project_type[]','Project Type','trim|required');
+            
+            if($this->form_validation->run() == FALSE)
+            {
+                $this->edit(base64_encode(convert_uuencode($project_id)));
+            }
+            else
+            {
+				$this->load->model('project_type');
+				
+                $project_name = $this->input->post('project_name');
+                $client_id = $this->input->post('client_name');
+                $site_address = $this->input->post('site_address');
+                $induction_instruction = $this->input->post('induction_instruction');
+                $project_type = implode(',', $this->input->post('project_type'));
+                $induction = implode(',', $this->input->post('induction'));
+                $data = array('project_name'=>$project_name,'client_id'=>$client_id,'project_type'=>$project_type,'induction'=>$induction,'instructions'=>$induction_instruction,'project_address'=>$site_address,'updated_at'=>date('Y-m-d H:i:s'),'updated_by'=>$this->vendorId);
+                
+                
+                $result = $this->project_type->editProject($data, $project_id);
+                
+                if($result == true)
+                {
+                    $this->session->set_flashdata('success', 'Project updated successfully');
+					redirect('Projects');
+                }
+                else
+                {
+                    $this->session->set_flashdata('error', 'Project updation failed');
+					 redirect('Projects/edit/'.base64_encode(convert_uuencode($project_id)));
+                }
+                
+               
+            }
         }
     }
-	
-	/**
-	 *Get Role List
-	 */
-	 public function roleList(){
-		$data['title'] = 'Admin Role List';
-		$this->load->model('users');
-		$data['roles'] = $this->users->getUserRoles();
-		$this->load->view('includes/header',$data);
-		$this->load->view('admin/admin_role_list');
-	 }
 }
 ?>

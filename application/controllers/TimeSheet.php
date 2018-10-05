@@ -29,7 +29,7 @@ Class TimeSheet extends BaseController {
 	$this->load->model('timesheetsModel');
 	$this->load->model('project_type');
 	
-	$data['title'] = 'Time List2';
+	$data['title'] = 'Schedule';
 	$typedata = $this->project_type->getPList();
 	
 	//echo '<pre>';
@@ -66,6 +66,56 @@ Class TimeSheet extends BaseController {
 	}
 	return $allData;
 }
+
+public function filtersamedate($arrayDara,$date){
+	$newarray = array();
+	foreach ($arrayDara as $data)
+    {
+        if ($data['schedule_date'] == $date){
+           //$newarray[$date][] = $data;
+		   $newarray[] = $data;
+		}
+    }
+	return $newarray;
+}
+
+/**
+ *@getClients List
+ *this method calls in view 
+ *created date: 04-10-2018
+ */
+ public function getAllClient(){
+	$this->layout = null;
+	//$this->load->model('clients');
+	$clientquery = $this->db->query("SELECT fname, lname, id as clientId FROM clients WHERE isDeleted=0");
+	return $clientquery->result_array();
+	
+ }
+ 
+ /**
+  *@method name: ajax_getProject
+  *@prams: clientId
+  */
+  
+  public function ajax_getProject(){
+	  $this->layout = null;
+	 $clientId = $_POST['cid'];
+	 $projectquery = $this->db->query("SELECT id as pId, project_name, 	client_id FROM projects WHERE client_id=$clientId");
+	 $projectdata = $projectquery->result_array();
+	 $selectHtml = '<label>Site</label><select name="sitename" id="sitename" class="required form-control"><option value="">Select Project</option>';
+	 $optinsval = '';
+	 if(!empty($projectdata)){
+		 foreach($projectdata as $pval){
+			 $optinsval.='<option value="'.$pval['pId'].'">'.$pval['project_name'].'</option>';
+		 }
+	 }
+	//print_r($projectquery->result_array());
+     $selectHtml .= $optinsval.'</select>';
+	 echo json_encode(array('resdata'=>$selectHtml));
+	  die;
+  }
+ 
+
 /**
  *@get Single User data
  *@scope fo this function -- Private
@@ -75,6 +125,27 @@ private function __singleUser($userId){
 	$singleU = $singleUquery->result_array();
 	return $singleU;
 }
+
+/**
+ *@submti Time sheet Ajax
+ */
+ 
+ public function ajax_addSchedule(){
+	  $this->layout = null; 
+	 $this->load->model('timesheetsModel'); 
+	 $dataSchedule = array('employee_id'=>$_POST['emp_id'],'project_id'=>$_POST['sitename'], 'project_type_id'=>$_POST['project_type_id'],'schedule_date'=>$_POST['bookingtime'], 'client_id'=>$_POST['clientname'],'client_name'=>$_POST['clientname'], 'instructions'=>$_POST['instructions'],'created_by'=>$this->vendorId, 'created_date'=>date('Y-m-d H:i:s'));
+	 //Inseter into shcedule table
+	 $result = $this->timesheetsModel->addSchedule($dataSchedule);
+     if($result > 0){
+			$messageArray = array('status'=>'success','message'=>'schedule added success');
+		} else {
+			$messageArray = array('status'=>'error','message'=>'Internal Error!');
+		}
+		$this->output
+    ->set_content_type('application/json');
+	 echo json_encode($messageArray);
+	  die;
+ }
  
  /*
   *@method name: grouplist
@@ -88,47 +159,6 @@ private function __singleUser($userId){
 	$data['title'] = 'Employee Group';
 	$this->load->view('includes/header',$data);
 	$this->load->view('admin/employee_glist');	
- }
- 
- /**
-  * @method:ajax_checkEmailExists
-  * @purpose: check duplicacy of user email on registration/edit page
-  * model used: users
-  */
-  
- public function ajax_checkEmailExists(){
-		$userId = $this->input->post("userId");
-       $email = $this->input->post("email");
-		$this->load->model('users');
-        if(empty($userId)){
-            $result = $this->users->checkEmailExists($email);
-        } else {
-            $result = $this->users->checkEmailExists($email, $userId);
-        }
-        if(empty($result)){
-			echo("true"); 
-			}
-        else { echo("false"); }
- }
- 
- /**
-  * @method:ajax_checkUsernameExists
-  * @purpose: check duplicacy of username on registration/edit page
-  * model used: users
-  */
- public function ajax_checkUsernameExists(){
-	 $userId = $this->input->post("userId");
-       $username = $this->input->post("username");
-		$this->load->model('users');
-        if(empty($userId)){
-            $result = $this->users->checkUsernameExists($username);
-        } else {
-            $result = $this->users->checkUsernameExists($username, $userId);
-        }
-        if(empty($result)){
-			echo("true"); 
-			}
-        else { echo("false"); }
  }
  
  /**
@@ -155,15 +185,5 @@ private function __singleUser($userId){
         }
     }
 	
-	/**
-	 *Get Role List
-	 */
-	 public function roleList(){
-		$data['title'] = 'Admin Role List';
-		$this->load->model('users');
-		$data['roles'] = $this->users->getUserRoles();
-		$this->load->view('includes/header',$data);
-		$this->load->view('admin/admin_role_list');
-	 }
 }
 ?>

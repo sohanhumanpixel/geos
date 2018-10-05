@@ -51,6 +51,7 @@ Class User extends CI_Controller {
 			'fname' => $result[0]->fname,
 			'lname' => $result[0]->lname,
 			'role_id' => $result[0]->role_id,
+			'role_name' => $result[0]->role_name,
 			'isLoggedIn' => TRUE
 			);
 			// Add user data in session

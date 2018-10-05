@@ -17,9 +17,17 @@ Class Admin extends BaseController {
 		$this->isLoggedIn(); 
 	}
 	public function index() {
-			$data['title'] = 'Dashboard';
-			$this->load->view('includes/header',$data);
-			$this->load->view('admin/dashboard');
+        $this->load->model('announcements');
+        $userRole = $this->announcements->getUserRole($this->vendorId);
+        if($userRole[0]->role_name=='Employee'){
+            $access = 'all';
+        }else{
+            $access = '';
+        }
+        $data['announcements'] = $this->announcements->getAnns($access);
+		$data['title'] = 'Dashboard';
+		$this->load->view('includes/header',$data);
+		$this->load->view('admin/dashboard');
 	}
 /**
  *@method name: userListing
@@ -28,7 +36,7 @@ Class Admin extends BaseController {
  *@date: 28-09-2018
 */ 
  public function userListing(){
-	 if($this->isAdmin() == TRUE)
+	 if($this->isTicketter() == TRUE)
         {
             $this->loadThis();
         }else{
@@ -37,7 +45,13 @@ Class Admin extends BaseController {
 			$searchText = '';
 			$count = $this->users->userListingCount($searchText);
 			$returns = $this->paginationCompress ( "employee_list/", $count, 10 );
-			$data['userRecords'] = $this->users->userListing($searchText, $returns["page"], $returns["segment"]);
+            $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
+            if($this->role!=1){
+              $access='admin';
+            }else{
+                $access = '';
+            }
+			$data['userRecords'] = $this->users->userListing($searchText, $returns["page"], $returns["segment"],$this->vendorId,$access);
 			$data['title'] = 'User List';
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/user_list');
@@ -51,7 +65,7 @@ Class Admin extends BaseController {
   *@create date: 28-09-2018
   */
  public function add_new_employee(){
-	 if($this->isAdmin() == TRUE)
+	 if($this->isTicketter() == TRUE)
         {
             $this->loadThis();
         }else{
@@ -69,7 +83,7 @@ Class Admin extends BaseController {
   */
     public function addNewUser()
     {
-        if($this->isAdmin() == TRUE)
+        if($this->isTicketter() == TRUE)
         {
             $this->loadThis();
         }
@@ -126,7 +140,7 @@ Class Admin extends BaseController {
 	 */
 	 
 	public function editemp($userId = NULL){
-		if($this->isAdmin() == TRUE)
+		if($this->isTicketter() == TRUE)
         {
             $this->loadThis();
         }else{
@@ -135,7 +149,12 @@ Class Admin extends BaseController {
                 redirect('employee_list');
             }
 			$this->load->model('users');
-			$data['roles'] = $this->users->getUserRoles();
+            if($this->role!=1){
+                $access = 'admin';
+            }else{
+                $access = '';
+            }
+			$data['roles'] = $this->users->getUserRoles($access);
 			
 			$userdata = $this->users->getUserInfo(convert_uudecode(base64_decode($userId)));
 			if(empty($userdata)){
@@ -155,7 +174,7 @@ Class Admin extends BaseController {
      */
     public function editEmpSave()
     {
-        if($this->isAdmin() == TRUE)
+        if($this->isTicketter() == TRUE)
         {
             $this->loadThis();
         }
@@ -265,7 +284,7 @@ Class Admin extends BaseController {
   */
     public function ajax_deleteUser()
     {
-        if($this->isAdmin() == TRUE)
+        if($this->isTicketter() == TRUE)
         {
             echo(json_encode(array('status'=>'access')));
         }
@@ -293,5 +312,6 @@ Class Admin extends BaseController {
 		$this->load->view('includes/header',$data);
 		$this->load->view('admin/admin_role_list');
 	 }
+     
 }
 ?>
