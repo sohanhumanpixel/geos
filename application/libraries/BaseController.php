@@ -35,7 +35,9 @@ class BaseController extends CI_Controller {
 		if (! isset ( $isLoggedIn['isLoggedIn'] ) || $isLoggedIn['isLoggedIn'] != TRUE) {
 			redirect ( 'login' );
 		} else {
+			$this->currentUser = $isLoggedIn;
 			$this->role = $isLoggedIn['role_id'];
+			$this->role_name = $isLoggedIn['role_name'];
 			$this->vendorId = $isLoggedIn['user_id'];
 			$this->name = $isLoggedIn['fname'].' '.$isLoggedIn['lname'];
 			//$this->roleText = $this->session->userdata ( 'roleText' );
