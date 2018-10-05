@@ -8,8 +8,9 @@ class Users extends CI_Model {
 	
 	 public function login($data) {
       $condition = "username =" . "'" . $data['username'] . "' AND " . "password =" . "'" . md5($data['password']) . "'";
-      $this->db->select('*');
-      $this->db->from('users');
+      $this->db->select('User.*,role.role_name');
+      $this->db->from('users as User');
+      $this->db->join('user_roles as role', 'User.role_id = role.id','left');
       $this->db->where($condition);
       $this->db->limit(1);
       $query = $this->db->get();
@@ -51,7 +52,7 @@ class Users extends CI_Model {
      * @return array $result : This is result
 	 * @created at: 28-09-2018
      */
-    function userListing($searchText = '', $page, $segment)
+    function userListing($searchText = '', $page, $segment,$sid = 0,$access = '')
     {
         $this->db->select('BaseTbl.id as userId, BaseTbl.email, BaseTbl.fname, BaseTbl.lname, BaseTbl.username, Role.role_name');
         $this->db->from('users as BaseTbl');
@@ -63,7 +64,10 @@ class Users extends CI_Model {
             $this->db->where($likeCriteria);
         }
         $this->db->where('BaseTbl.isDeleted', 0);
-        $this->db->where('BaseTbl.role_id !=', 1);
+        $this->db->where('BaseTbl.id !=', $sid);
+        if($access!=""){
+           $this->db->where('BaseTbl.role_id !=', 1); 
+        }
         $this->db->limit($page, $segment);
         $query = $this->db->get();
         
@@ -129,9 +133,12 @@ class Users extends CI_Model {
 	 *@method: getUserRoles
 	 */
 	 
-	 function getUserRoles(){
+	 function getUserRoles($access = ''){
 		$this->db->select('id as roleId, role_name');
         $this->db->from('user_roles');
+        if($access!=""){
+            $this->db->where('id !=',1);
+        }
         $query = $this->db->get();
         return $query->result();
 	 }
@@ -176,7 +183,17 @@ class Users extends CI_Model {
         return TRUE;
     }
 	
-	
+	function getCurrentUser($id){
+        $this->db->select('BaseTbl.id as userId, BaseTbl.email, BaseTbl.fname, BaseTbl.lname, BaseTbl.username, Role.role_name');
+        $this->db->from('users as BaseTbl');
+        $this->db->join('user_roles as Role', 'Role.id = BaseTbl.role_id','left');
+        $this->db->where('BaseTbl.isDeleted', 0);
+        $this->db->where('BaseTbl.id', $id);
+        $query = $this->db->get();
+        
+        $result = $query->result();        
+        return $result;
+     }
 /**
  * @method	:		logout
  * @purpose	:	logut to user and destroy session
