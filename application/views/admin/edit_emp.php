@@ -4,14 +4,14 @@
 	$this->load->view('includes/left_sidebar');
 	?>
 	
-	<div class="col-md-10">
+	<div class="col-md-9">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
 						<h3>Add New User</h3>
 					</div>
 					<div class="panel-options">
-					  <a href="employee_list" class="btn btn-success">Go Back</a>
+					  <a href="<?php echo base_url() ?>employee_list" class="btn btn-success">Go Back</a>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -28,7 +28,7 @@
 								 <input type="hidden" value="<?php echo $userInfo[0]->id; ?>" name="userId" id="userId" />    
 							</div>
 							<div class="form-group">
-								<label>Emil Address<em>*</em></label>
+								<label>Email Address<em>*</em></label>
 								<input class="form-control required email" name="email" id="email" placeholder="Enter user's email" type="text" value="<?php echo $userInfo[0]->email; ?>" />
 							</div>
 							<div class="form-group">
@@ -86,5 +86,6 @@
 	
 	</div>
 </div>
+<?php $this->load->view('includes/footer');?> 
 <script src="<?php echo base_url(); ?>assets/frontend/js/jquery.validate.min.js" type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>assets/frontend/js/editUser.js" type="text/javascript"></script>

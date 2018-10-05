@@ -1,7 +1,7 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
-		<div class="col-md-10">
+		<div class="col-md-9">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -51,3 +51,4 @@
 		</div>
 	</div>
 </div>
+<?php $this->load->view('includes/footer');?> 

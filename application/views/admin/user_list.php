@@ -1,7 +1,7 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
-		<div class="col-md-10">
+		<div class="col-md-9">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -35,6 +35,17 @@
 								</tr>
 							</thead>
 							<tbody>
+					<tr>
+						<td><?=$currentUser[0]->fname?></td>
+						<td><?=$currentUser[0]->lname?></td>
+						<td><?=$currentUser[0]->email?></td>
+						<td><?=$currentUser[0]->username?></td>
+						<td><?=$currentUser[0]->role_name?><em>(You)</em></td>
+						<td class="text-center">
+                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Admin/editemp/'.base64_encode(convert_uuencode($currentUser[0]->userId)); ?>"><i class="glyphicon  glyphicon-pencil"></i></a>
+                          <a class="btn btn-sm btn-danger deleteUser" href="javaScript:void(0);" data-userid="<?php echo $currentUser[0]->userId; ?>"><i class="glyphicon  glyphicon-trash"></i></a>
+                      </td>
+					</tr>
 							<?php
                     if(!empty($userRecords))
                     {
@@ -67,4 +78,5 @@
 		</div>
 	</div>
 </div>
+<?php $this->load->view('includes/footer');?> 
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/frontend/js/common.js" charset="utf-8"></script>
