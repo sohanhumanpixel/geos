@@ -42,9 +42,10 @@ Class TimeSheet extends BaseController {
  
  /**
   *this function called into view 
+  *getJob data datewise
   */
- function getEmployee($type_id){
-	$startdate = date('Y-m-d');
+ function getEmployee($type_id,$startdate){
+	//$startdate = date('Y-m-d');
 	$enddate = date('Y-m-d', strtotime("+7 day"));
 	//$query = $this->db->query("SELECT DISTINCT(employee_id) FROM timesheets WHERE project_id=$type_id AND (date >= '$startdate' AND date <= '$enddate')");
 	$emprole = ROLE_EMPLOYEE;
@@ -184,6 +185,13 @@ private function __singleUser($userId){
 				}
         }
     }
+	
+	/**
+	 *@get Edit Data for sheet
+	 */
+	 public function ajax_editScheduleData(){
+		 
+	 }
 	
 }
 ?>
