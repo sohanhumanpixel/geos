@@ -4,7 +4,7 @@ class project_type extends CI_Model {
 	function getPList(){
 		$this->db->select('id, project_type_name');
         $this->db->from('project_type');
-		$this->db->order_by("project_type_name", "asc");
+		$this->db->order_by("id", "asc");
         $query = $this->db->get();
         return $query->result();
 	}
@@ -26,8 +26,8 @@ class project_type extends CI_Model {
          $this->db->select('p.id');
         $this->db->from('projects as p');
         $this->db->join('clients as c', 'p.client_id = c.id','left');
+        $this->db->where('p.isDeleted',0);
         $query = $this->db->get();
-        
         return count($query->result());
     }
     public function getProjects($searchText = '', $page, $segment) {
@@ -35,6 +35,8 @@ class project_type extends CI_Model {
         $this->db->from("projects as p");
         $this->db->join('clients as c', 'p.client_id = c.id','left');
         $this->db->join('users as u', 'p.project_manager_id = u.id','left');
+        $this->db->where('p.isDeleted',0);
+        $this->db->order_by("p.id", "desc");
         $this->db->limit($page, $segment);
         $query = $this->db->get();
 
@@ -54,6 +56,12 @@ class project_type extends CI_Model {
         $this->db->update('projects', $data);
         
         return TRUE;
+    }
+    public function deleteProject($id, $data)
+    {
+        $this->db->where('id', $id);
+        $this->db->update('projects', $data);
+        return $this->db->affected_rows();
     }
 }
 ?>
