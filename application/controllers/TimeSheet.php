@@ -96,6 +96,7 @@ public function filtersamedate($arrayDara,$date){
  /**
   *@method name: ajax_getProject
   *@prams: clientId
+  *@whereUsing: add schedule/ Edit Schedule
   */
   
   public function ajax_getProject(){
@@ -104,6 +105,23 @@ public function filtersamedate($arrayDara,$date){
 	 $projectquery = $this->db->query("SELECT id as pId, project_name, 	client_id FROM projects WHERE client_id=$clientId");
 	 $projectdata = $projectquery->result_array();
 	 $selectHtml = '<label>Site</label><select name="sitename" id="sitename" class="required form-control"><option value="">Select Project</option>';
+	 $optinsval = '';
+	 if(!empty($projectdata)){
+		 foreach($projectdata as $pval){
+			 $optinsval.='<option value="'.$pval['pId'].'">'.$pval['project_name'].'</option>';
+		 }
+	 }
+	//print_r($projectquery->result_array());
+     $selectHtml .= $optinsval.'</select>';
+	 echo json_encode(array('resdata'=>$selectHtml));
+	  die;
+  }
+  public function ajax_getEditProject(){
+	  $this->layout = null;
+	 $clientId = $_POST['cid'];
+	 $projectquery = $this->db->query("SELECT id as pId, project_name, 	client_id FROM projects WHERE client_id=$clientId");
+	 $projectdata = $projectquery->result_array();
+	 $selectHtml = '<label>Site</label><select name="editsitename" id="editsitename" class="required form-control"><option value="">Select Project</option>';
 	 $optinsval = '';
 	 if(!empty($projectdata)){
 		 foreach($projectdata as $pval){
@@ -190,8 +208,49 @@ private function __singleUser($userId){
 	 *@get Edit Data for sheet
 	 */
 	 public function ajax_editScheduleData(){
-		 
+		$scheduleId = $_POST['scheduleId'];
+		// Get schedule data of specific table
+		$this->layout = null; 
+		$this->load->model('timesheetsModel');
+		$clientData = $this->getAllClient();
+		$scheduleData = $this->timesheetsModel->getEditSchedule($scheduleId);
+		$clientId = $scheduleData[0]['client_id'];
+		$projectquery = $this->db->query("SELECT id as pId, project_name, client_id FROM projects WHERE client_id=$clientId");
+		
+		$data['cliendata'] = $clientData;
+		$data['scheduleData'] = $scheduleData;
+		$data['projectData'] = $projectquery->result_array();
+		if ($this->input->is_ajax_request()) {
+			$this->load->view('timesheet/ajax_edit_schedule',$data);
+		}
+		//$this->load->view('timesheet/ajax_edit_schedule');
+		//echo json_encode(array('status'=>'success','scheData'=>$scheduleData));
+		//die;
 	 }
+	 
+	 /**
+	  *@method: ajax_updateScheduleData
+	  */
+	  
+	  public function ajax_updateScheduleData(){
+		  if ($this->input->is_ajax_request()) {
+			 $this->layout = null; 
+			$this->load->model('timesheetsModel'); 
+			$scheduleId = $_POST['schedule_id'];
+			$editScheduleD = array('project_id'=>$_POST['editsitename'], 'project_type_id'=>$_POST['project_type_id'],'schedule_date'=>$_POST['editbookingtime'], 'client_id'=>$_POST['editclientname'],'client_name'=>$_POST['editclientname'], 'instructions'=>$_POST['instructions'],'updated_at'=>date('Y-m-d H:i:s'));
+			//Inseter into shcedule table
+			$result = $this->timesheetsModel->editSchedule($editScheduleD,$scheduleId);
+     if($result){
+			$messageArray = array('status'=>'success','message'=>'Schedule updated success');
+		} else {
+			$messageArray = array('status'=>'error','message'=>'Internal Error!');
+		}
+		$this->output
+    ->set_content_type('application/json');
+	 echo json_encode($messageArray);
+	  die; 
+		  }
+	  }
 	
 }
 ?>

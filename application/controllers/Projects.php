@@ -49,7 +49,7 @@ Class Projects extends BaseController {
         	$this->load->model('clients');
         	$data['project_types'] = $this->project_type->getPList();
         	$data['clients'] = $this->clients->getAllClients();
-        	$data['inductions'] = $this->project_type->getInductions();
+        	//$data['inductions'] = $this->project_type->getInductions();
         	$data['title'] = 'Add New Project';
 			$this->load->view('includes/header',$data);
 			$this->load->view('projects/add_project');
@@ -65,7 +65,9 @@ Class Projects extends BaseController {
         	$this->form_validation->set_rules('project_name','Project Name','trim|required|max_length[128]');
         	$this->form_validation->set_rules('client_name','Client Name','required');
         	$this->form_validation->set_rules('site_address','Project Site Address','trim|required');
-        	$this->form_validation->set_rules('induction[]','Online Induction','trim|required');
+			if($this->input->post('is_induction')){
+				$this->form_validation->set_rules('induction_url','Induction URL','trim|required');
+			}
         	$this->form_validation->set_rules('project_type[]','Project Type','trim|required');
         	if($this->form_validation->run() == FALSE)
             {
@@ -79,9 +81,13 @@ Class Projects extends BaseController {
                 $induction_instruction = $this->input->post('induction_instruction');
                 $project_type = implode(',', $this->input->post('project_type'));
                 $project_code = mt_rand(100000, 999999);
-                $induction = implode(',', $this->input->post('induction'));
-                $data = array('project_name'=>$project_name,'client_id'=>$client_id,'project_type'=>$project_type,'induction'=>$induction,'instructions'=>$induction_instruction,'project_manager_id'=>$this->vendorId,'project_code'=>$project_code,'project_address'=>$site_address,'created_date'=>date('Y-m-d H:i:s'));
+				$is_induction = (isset($_POST['is_induction'])) ? $this->input->post('is_induction') : 0;
+                //$induction = implode(',', $this->input->post('induction'));
+				$induction = $this->input->post('induction_url');
+                $data = array('project_name'=>$project_name,'client_id'=>$client_id,'project_type'=>$project_type,'is_induction'=>$is_induction,'induction_url'=>$induction, 'instructions'=>$induction_instruction,'project_manager_id'=>$this->vendorId,'project_code'=>$project_code,'project_address'=>$site_address,'created_date'=>date('Y-m-d H:i:s'));
+				
                 $this->load->model('project_type');
+				
                 $result = $this->project_type->addNewProject($data);
                 if($result > 0)
                 {
@@ -109,7 +115,7 @@ Class Projects extends BaseController {
 			$this->load->model('clients');
 			$data['project_types'] = $this->project_type->getPList();
         	$data['clients'] = $this->clients->getAllClients();
-        	$data['inductions'] = $this->project_type->getInductions();
+        	//$data['inductions'] = $this->project_type->getInductions();
 			$project_data = $this->project_type->getProjectById(convert_uudecode(base64_decode($projectId)));
 			if(empty($project_data)){
 				  redirect('projects');
@@ -135,7 +141,11 @@ Class Projects extends BaseController {
             $this->form_validation->set_rules('project_name','Project Name','trim|required|max_length[128]');
         	$this->form_validation->set_rules('client_name','Client Name','required');
         	$this->form_validation->set_rules('site_address','Project Site Address','trim|required');
-        	$this->form_validation->set_rules('induction[]','Online Induction','trim|required');
+			
+			if($this->input->post('is_induction')){
+				$this->form_validation->set_rules('induction_url','Induction URL','trim|required');
+			}
+			
         	$this->form_validation->set_rules('project_type[]','Project Type','trim|required');
             
             if($this->form_validation->run() == FALSE)
@@ -151,8 +161,11 @@ Class Projects extends BaseController {
                 $site_address = $this->input->post('site_address');
                 $induction_instruction = $this->input->post('induction_instruction');
                 $project_type = implode(',', $this->input->post('project_type'));
-                $induction = implode(',', $this->input->post('induction'));
-                $data = array('project_name'=>$project_name,'client_id'=>$client_id,'project_type'=>$project_type,'induction'=>$induction,'instructions'=>$induction_instruction,'project_address'=>$site_address,'updated_at'=>date('Y-m-d H:i:s'),'updated_by'=>$this->vendorId);
+                //$induction = implode(',', $this->input->post('induction'));
+				
+				$is_induction = (isset($_POST['is_induction'])) ? $this->input->post('is_induction') : 0;
+				$induction = $this->input->post('induction_url');
+                $data = array('project_name'=>$project_name,'client_id'=>$client_id,'project_type'=>$project_type,'is_induction'=>$is_induction,'induction_url'=>$induction,'instructions'=>$induction_instruction,'project_address'=>$site_address,'updated_at'=>date('Y-m-d H:i:s'),'updated_by'=>$this->vendorId);
                 
                 
                 $result = $this->project_type->editProject($data, $project_id);
@@ -170,6 +183,25 @@ Class Projects extends BaseController {
                 
                
             }
+        }
+    }
+    public function ajax_deleteProject()
+    {
+        if($this->isTicketter() == TRUE)
+        {
+            echo(json_encode(array('status'=>'access')));
+        }
+        else
+        {
+			$this->load->model('project_type');
+            $projectId = $this->input->post('projectId');
+            $projectInfo = array('isDeleted'=>1,'updated_by'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
+            $result = $this->project_type->deleteProject($projectId, $projectInfo);
+           if ($result > 0) {
+			   echo(json_encode(array('status'=>TRUE)));
+			   }else{
+				   echo(json_encode(array('status'=>FALSE))); 
+				}
         }
     }
 }
