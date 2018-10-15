@@ -41,7 +41,24 @@ Class Profile extends BaseController {
             else
             {
 				$this->load->model('users');
-				
+                if($this->input->post('profile')!=""){
+                    $img = $this->input->post('profile');
+                    $upload_path=base_url()."assets/images/profile/"; 
+                    $uid='10'; //creare seperate folder for each user 
+                    $upPath=$upload_path."/".$uid;
+                    $config = array(
+                    'upload_path' => $upPath,
+                    'allowed_types' => "gif|jpg|png|jpeg",
+                    'overwrite' => TRUE,
+                    'max_size' => "2048000", 
+                    'max_height' => "768",
+                    'max_width' => "1024"
+                    );
+                    $this->load->library('upload', $config);
+                    $this->upload->do_upload('profile');
+                    die('kkk');
+                    
+                }
                 $fname = ucwords(strtolower($this->input->post('fname')));
 				$lname = ucwords(strtolower($this->input->post('lname')));
                 $email = $this->input->post('email');
