@@ -17,6 +17,9 @@ Class Admin extends BaseController {
 		$this->isLoggedIn(); 
 	}
 	public function index() {
+		if($this->role==ROLE_EMPLOYEE){
+			redirect('Employee/dashboard');
+		}
         $this->load->model('announcements');
         $userRole = $this->announcements->getUserRole($this->vendorId);
         if($userRole[0]->role_name=='Employee'){
