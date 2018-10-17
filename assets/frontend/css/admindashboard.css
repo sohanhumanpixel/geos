@@ -847,6 +847,20 @@ label.ch{
 .navbar-inverse .navbar-nav>li>a:focus {
     color: #000;
 }
+.accordion-toggle:after {
+    font-family: 'Glyphicons Halflings';
+    content: "\e114";
+    float: right;
+    color: #ccc;
+}
+.accordion-toggle.collapsed:after {
+    content: "\e080"; 
+	color: #ccc;	
+}
+.border_accordian{
+	border-bottom: 1px solid;
+}
+
 @media only screen and (min-width: 768px){
 
 .logo {
