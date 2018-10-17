@@ -131,5 +131,73 @@ Class Employee extends BaseController {
 		$this->load->view('includes/header',$data);
 		$this->load->view('admin/admin_role_list');
 	 }
+	 
+	 /**
+	  *@get employeed Leave List
+	  *@ajax request
+	  *@created date: 16-10-2018
+	  */
+	public function ajax_getLeaveList(){
+		echo '[
+  {
+    "title": "All Day Event",
+    "start": "2018-10-01"
+  },
+  {
+    "title": "Diwali leave",
+    "start": "2018-11-07",
+    "end": "2018-11-10",
+   "color": "#8A2BE2"
+  },
+  {
+    "id": "999",
+    "title": "Repeating Event",
+    "start": "2018-10-09T16:00:00-05:00",
+	"color": "green"
+  },
+  {
+    "id": "999",
+    "title": "Repeating Event",
+    "start": "2018-10-16T16:00:00-05:00"
+  },
+  {
+    "title": "Conference",
+    "start": "2018-10-11",
+    "end": "2018-10-13",
+	"color": "red"
+  },
+  {
+    "title": "Meeting",
+    "start": "2018-10-12T10:30:00-05:00",
+    "end": "2018-10-12T12:30:00-05:00"
+  },
+  {
+    "title": "Lunch",
+    "start": "2018-10-12T12:00:00-05:00"
+  },
+  {
+    "title": "Meeting",
+    "start": "2018-10-12T14:30:00-05:00"
+  },
+  {
+    "title": "Happy Hour",
+    "start": "2018-10-12T17:30:00-05:00"
+  },
+  {
+    "title": "Dinner",
+    "start": "2018-10-12T20:00:00"
+  },
+  {
+    "title": "Birthday Party",
+    "start": "2018-10-13T07:00:00-05:00"
+  },
+  {
+    "title": "Click for Google",
+    "url": "http://google.com/",
+    "start": "2018-10-28"
+  }
+]';
+	  die;
+	}
 }
 ?>
