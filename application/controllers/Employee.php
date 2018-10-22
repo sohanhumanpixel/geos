@@ -144,9 +144,9 @@ Class Employee extends BaseController {
     "start": "2018-10-01"
   },
   {
-    "title": "Diwali leave",
-    "start": "2018-11-07",
-    "end": "2018-11-10",
+    "title": "New Year",
+    "start": "2018-12-29",
+    "end": "2019-01-01",
    "color": "#8A2BE2"
   },
   {

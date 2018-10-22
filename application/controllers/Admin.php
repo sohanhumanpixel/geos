@@ -75,6 +75,7 @@ Class Admin extends BaseController {
 			$this->load->model('users');
 			$data['roles'] = $this->users->getUserRoles();
 			$data['title'] = 'Add New Employee';
+			$data['allskills'] = $this->users->getAllSkills();
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/add_new_emp');
 		}
@@ -114,14 +115,34 @@ Class Admin extends BaseController {
                 $username = $this->input->post('username');
                 $password = $this->input->post('password');
                 $roleId = $this->input->post('role');
+				$skillsInput = $this->input->post('user_skills');
+				$constcartName = '';
+				if($_FILES['construction_card']['name']!=''){
+					//Upload
+					$upload_path = "assets/images/usercard/";
+					$imagetype = $_FILES['construction_card']['type'];
+					$filename = $_FILES['construction_card']['name'];
+					$tempname = $_FILES["construction_card"]["tmp_name"];
+					$t = preg_replace('/\s+/', '', time());
+					$fileName = $t . ''.str_replace(' ','',$filename);
+					$moved =  move_uploaded_file($tempname,$upload_path.''.$fileName);
+					if( $moved ) {
+						$constcartName = $fileName;
+					}
+				}
                 $userInfo = array('email'=>$email, 'password'=>md5($password), 'role_id'=>$roleId, 'fname'=> $fname,'lname'=> $lname,
-                                    'username'=>$username, 'createdBy'=>$this->vendorId, 'created_at'=>date('Y-m-d H:i:s'));
+                                    'username'=>$username,'contact_phone'=>$this->input->post('contact_phone'), 'address'=>$this->input->post('address'),'construction_card'=>$constcartName, 'createdBy'=>$this->vendorId, 'created_at'=>date('Y-m-d H:i:s'));
                 
                 $this->load->model('users');
                 $result = $this->users->addNewUser($userInfo);
                 
                 if($result > 0)
                 {
+					if(!empty($skillsInput)){
+						foreach($skillsInput as $skill){
+							$this->db->query("INSERT INTO users_skills ( user_id, skill_id) VALUES ('$result', '$skill')");
+						}
+					}
                     $this->session->set_flashdata('success', 'New User created successfully');
 					redirect('employee_list');
                 }
@@ -158,13 +179,15 @@ Class Admin extends BaseController {
                 $access = '';
             }
 			$data['roles'] = $this->users->getUserRoles($access);
-			
+			$data['allskills'] = $this->users->getAllSkills();
 			$userdata = $this->users->getUserInfo(convert_uudecode(base64_decode($userId)));
 			if(empty($userdata)){
 				  redirect('employee_list');
 			}
+			$data['title'] = 'Edit Employee';
 			$data['userInfo'] = $userdata;
-			$data['title'] = 'Add New Employee';
+			$data['userSkills'] = $this->users->getUserSkillIDs(convert_uudecode(base64_decode($userId)));
+			
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/edit_emp');
 		}
@@ -207,23 +230,48 @@ Class Admin extends BaseController {
                 $email = $this->input->post('email');
                 $username = $this->input->post('username');
                 $roleId = $this->input->post('role');
-                
+                $skillsInput = $this->input->post('user_skills');
+				
+				if($_FILES['construction_card']['name']!=''){
+					//Upload
+					$upload_path = "assets/images/usercard/";
+					$imagetype = $_FILES['construction_card']['type'];
+					$filename = $_FILES['construction_card']['name'];
+					$tempname = $_FILES["construction_card"]["tmp_name"];
+					$t = preg_replace('/\s+/', '', time());
+					$fileName = $t . ''.str_replace(' ','',$filename);
+					$moved =  move_uploaded_file($tempname,$upload_path.''.$fileName);
+					if( $moved ) {
+						$oldcons = $this->input->post('oldcard');
+						$constcartName = $fileName;
+						($oldcons!='') ? unlink($upload_path.''.$oldcons): '';
+					}
+				}
+				
+				
                 $userInfo = array();
                 $password = '';
                 if(empty($password))
                 {
-                    $userInfo = array('email'=>$email, 'role_id'=>$roleId, 'fname'=> $fname,'lname'=> $lname,'username'=>$username, 'updatedBy'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
+                    $userInfo = array('email'=>$email, 'role_id'=>$roleId, 'fname'=> $fname,'lname'=> $lname,'username'=>$username,'contact_phone'=>$this->input->post('contact_phone'), 'address'=>$this->input->post('address'),'construction_card'=>$constcartName, 'updatedBy'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
                 }
                 else
                 {
-                    $userInfo = array('email'=>$email, 'password'=>md5($password), 'role_id'=>$roleId,
-                        'fname'=> $fname,'lname'=> $lname,'username'=>$username, 'updatedBy'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
+                    $userInfo = array('email'=>$email, 'password'=>md5($password), 'role_id'=>$roleId,'fname'=> $fname,'lname'=> $lname,'username'=>$username, 'updatedBy'=>$this->vendorId,'contact_phone'=>$this->input->post('contact_phone'),'address'=>$this->input->post('address'),'construction_card'=>$constcartName,'updated_at'=>date('Y-m-d H:i:s'));
                 }
                 
                 $result = $this->users->editUser($userInfo, $userId);
                 
                 if($result == true)
                 {
+					if(!empty($skillsInput)){
+						//First delete user skills then need to inseret
+						$this->db->query("DELETE FROM users_skills WHERE user_id = $userId");
+						foreach($skillsInput as $skill){
+							$this->db->query("INSERT INTO users_skills ( user_id, skill_id) VALUES ('$userId', '$skill')");
+						}
+					}
+					
                     $this->session->set_flashdata('success', 'User updated successfully');
 					redirect('employee_list');
                 }
@@ -315,6 +363,105 @@ Class Admin extends BaseController {
 		$this->load->view('includes/header',$data);
 		$this->load->view('admin/admin_role_list');
 	 }
-     
+	 
+	 /**
+	  *@user's view Profile
+	  *@created date: 18-10-2018
+	  */
+	  
+    public function viewprofile($userId){
+		if($this->isTicketter() == TRUE)
+		{
+			$this->loadThis();
+		}else{
+			$data['title'] = 'User Profile';
+			$realuserId = convert_uudecode(base64_decode($userId));
+			$this->load->model('users');
+			
+			$data['profileData'] = $this->users->userProfileData($realuserId);
+			//echo '<pre>';
+			//print_r($userData);
+			//die;
+			$this->load->view('includes/header',$data);
+			$this->load->view('admin/userprofile');
+		}
+	}
+	
+	/**
+	 *Add User Skills
+	 *@created date: 18-10-2018
+	 */
+	
+    public function AddUserSkills($userId){
+		if($this->isTicketter() == TRUE)
+		{
+			$this->loadThis();
+			
+		}else{
+			$realuserId = convert_uudecode(base64_decode($userId));
+			$this->load->model('users');
+			$data['title'] = 'User Profile';
+			$this->load->view('includes/header',$data);
+			$this->load->view('admin/addskillstemp');
+		}
+		
+	}
+	
+	/**
+		 * Get HTML Template for Uploade Image
+		 * Created Date: 19-10-2018
+		 */
+	function ajax_editImageHtml(){
+		if ($this->input->is_ajax_request()) {
+			if($_FILES['profileimage']['name']!=''){
+				$currentUserId = convert_uudecode(base64_decode($_POST['uuid']));
+				$valid_extensions = array('jpeg', 'jpg', 'png', 'gif');
+				$upload_path = "assets/images/profile/";
+				$imagetype = $_FILES['profileimage']['type'];
+				$filename = $_FILES['profileimage']['name'];
+				$tempname = $_FILES["profileimage"]["tmp_name"];
+				
+				$imageFileType = strtolower(pathinfo($filename,PATHINFO_EXTENSION));
+				
+				$t = preg_replace('/\s+/', '', time());
+				$fileName = $t . ''.str_replace(' ','',$filename);
+				
+				if ($_FILES["profileimage"]["size"] > 500000) {
+					echo json_encode(array('status'=>'error','message'=>'Sorry, your file is too large.'));
+					die;
+				}else if(!in_array($imageFileType, $valid_extensions)){
+					echo json_encode(array('status'=>'error','message'=>$imageFileType));
+					die;
+				}else{
+					$moved =  move_uploaded_file($tempname,$upload_path.''.$fileName);
+					if( $moved ) {
+						//unlink image
+						$oimage = $_POST['oimage'];
+						($oimage!='') ? unlink($upload_path.''.$oimage): '';
+						$this->load->model('users');
+						$updateD = array('image'=>$fileName);
+						$this->users->updateProfileimg($updateD,$currentUserId);
+						echo json_encode(array('status'=>'success','message'=>base_url().''.$upload_path.''.$fileName));die;
+					}else{
+						echo json_encode(array('status'=>'error','message'=>"Not uploaded because of error #".$_FILES["document_name"]["error"]));die;
+					}
+				}	
+			}else{
+				echo json_encode(array('status'=>'error','message'=>"Please Select image"));
+				die;
+			}
+		}
+		die;
+	}
+	
+   /**
+	 *Add User Skills
+	 *@created date: 18-10-2018
+	*/
+	
+    public function GetUserSkills($userId){
+			
+	}	
+	
 }
 ?>

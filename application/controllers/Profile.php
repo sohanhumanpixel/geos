@@ -16,10 +16,16 @@ Class Profile extends BaseController {
 		$this->load->library('session');
 		$this->isLoggedIn(); 
 	}
+	
+	/**
+	 *@Updated Date: 19-10-2018
+	 */
+	 
     public function index(){
      	$this->load->model('users');
-     	$userdata = $this->users->getUserInfo($this->vendorId);
-     	$data['userInfo'] = $userdata;
+     	//$userdata = $this->users->getUserInfo($this->vendorId);
+		$data['profileData'] = $this->users->userProfileData($this->vendorId);
+     	//$data['userInfo'] = $userdata;
         $data['title'] = 'Edit Profile';
 		$this->load->view('includes/header',$data);
 		$this->load->view('admin/myprofile');
@@ -126,4 +132,47 @@ Class Profile extends BaseController {
 			    }
 	        }
         }
+		
+		/**
+		 * Get HTML Template for Uploade Image
+		 * Created Date: 19-10-2018
+		 */
+		function ajax_editImageHtml(){
+			if ($this->input->is_ajax_request()) {
+				if($_FILES['profileimage']['name']!=''){
+					$valid_extensions = array('jpeg', 'jpg', 'png', 'gif');
+					$upload_path = "assets/images/profile/";
+					$imagetype = $_FILES['profileimage']['type'];
+					$filename = $_FILES['profileimage']['name'];
+					$tempname = $_FILES["profileimage"]["tmp_name"];
+					//$target_file = 
+					
+					$imageFileType = strtolower(pathinfo($filename,PATHINFO_EXTENSION));
+					
+					$t = preg_replace('/\s+/', '', time());
+					$fileName = $t . ''.str_replace(' ','',$filename);
+					
+					if ($_FILES["profileimage"]["size"] > 500000) {
+						echo json_encode(array('status'=>'error','message'=>'Sorry, your file is too large.'));
+						die;
+					}else if(!in_array($imageFileType, $valid_extensions)){
+						echo json_encode(array('status'=>'error','message'=>$imageFileType));
+						die;
+					}else{
+						$moved =  move_uploaded_file($tempname,$upload_path.''.$fileName);
+						if( $moved ) {
+							//unlink image
+							$this->load->model('users');
+							$currentUserId = $this->vendorId;
+							$updateD = array('image'=>$fileName);
+							$this->users->updateProfileimg($updateD,$currentUserId);
+							echo json_encode(array('status'=>'success','message'=>base_url().''.$upload_path.''.$fileName));die;
+						}else{
+							echo json_encode(array('status'=>'success','message'=>"Not uploaded because of error #".$_FILES["document_name"]["error"]));die;
+						}
+					}	
+				}
+			}
+			die;
+		}
     }
