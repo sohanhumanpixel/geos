@@ -162,7 +162,7 @@ class Users extends CI_Model {
      */
     function getUserInfo($userId)
     {
-        $this->db->select('id, fname, lname, email, username, role_id');
+        $this->db->select('id, fname, lname, email, username, role_id,contact_phone, address, construction_card');
         $this->db->from('users');
         $this->db->where('isDeleted', 0);
         $this->db->where('id', $userId);
@@ -184,7 +184,7 @@ class Users extends CI_Model {
     }
 	
 	function getCurrentUser($id){
-        $this->db->select('BaseTbl.id as userId, BaseTbl.email, BaseTbl.fname, BaseTbl.lname, BaseTbl.username, Role.role_name');
+        $this->db->select('BaseTbl.id as userId, BaseTbl.email, BaseTbl.construction_card, BaseTbl.fname, BaseTbl.lname, BaseTbl.username, Role.role_name');
         $this->db->from('users as BaseTbl');
         $this->db->join('user_roles as Role', 'Role.id = BaseTbl.role_id','left');
         $this->db->where('BaseTbl.isDeleted', 0);
@@ -194,14 +194,88 @@ class Users extends CI_Model {
         $result = $query->result();        
         return $result;
      }
-/**
- * @method	:		logout
- * @purpose	:	logut to user and destroy session
- * @author : Humanpixel
- * @since : 27 Sep 2018
- * @not used now
- */
-	public function logout(){
+     public function check_current_pwd($user_id,$current_pwd){
+      $current_pwd = md5($current_pwd);
+      $this->db->select('password');
+       $this->db->from('users');
+      $this->db->where('id', $user_id);
+      $this->db->where('password', $current_pwd);
+      $query = $this->db->get();
+      return $query->result();
+    }
+     public function pass_update($user_id,$userdata){
+
+      $this->db->where('id', $user_id);
+      $this->db->update('users', $userdata);
+      return true;
+    }
+	
+	/**
+	 *@get Employee Profile data from user list click view
+	 *@created date; 18-10-2018 
+	 */
+	 
+	public function userProfileData($empid){
+		$arraydata = array();
+		$this->db->select('UserTbl.id as userId, UserTbl.email, UserTbl.fname, UserTbl.lname, UserTbl.username,UserTbl.address,UserTbl.image, UserTbl.contact_phone, UserTbl.construction_card, Role.role_name');
+        $this->db->from('users as UserTbl');
+        $this->db->join('user_roles as Role', 'Role.id = UserTbl.role_id','left');
+        $this->db->where('UserTbl.isDeleted', 0);
+        $this->db->where('UserTbl.id', $empid);
+        $query = $this->db->get();
+        $result = $query->result();
+		$skillsData = $this->getUserSkill($empid);
+		$arraydata['userdata'] = $result;
+		$arraydata['Userskills'] = $skillsData;
+		
+		return $arraydata;
 	}
+	
+	/**
+	 *get user Skills
+	 */
+	function getUserSkill($userId){
+		//
+		$this->db->select('users_skills.user_id, users_skills.skill_id, skills.skill_name');
+        $this->db->from('users_skills');
+        $this->db->join('skills', 'skills.id = users_skills.skill_id','left');
+        $this->db->where('users_skills.user_id', $userId);
+        $query = $this->db->get();
+        return $query->result();
+	}
+	
+	/**
+	 *get user Skills
+	 */
+	function getUserSkillIDs($userId){
+		//
+		$this->db->select('users_skills.skill_id');
+        $this->db->from('users_skills');
+        $this->db->where('users_skills.user_id', $userId);
+        $query = $this->db->get();
+        return $query->result_array();
+	}
+	
+	/**
+	 *@get All Skills
+	 */
+	 
+	 function getAllSkills(){
+		$this->db->select('*');
+        $this->db->from('skills');
+        $query = $this->db->get();
+        return $query->result();
+	 }
+	 
+	 /**
+	  *Update user Profile Pic
+	  *Created date: 19-10-2018
+	  */
+	 function updateProfileimg($filename, $userId){
+		$this->db->where('id', $userId);
+        $this->db->update('users', $filename);
+        return $this->db->affected_rows();
+	  }
+
 }
 ?>
