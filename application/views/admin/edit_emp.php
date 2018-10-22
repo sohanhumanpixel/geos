@@ -1,7 +1,13 @@
 <div class="page-content">
 	<div class="row">
-	<?php 
+	<?php
 	$this->load->view('includes/left_sidebar');
+	$skilids = array();
+	if(!empty($userSkills)){
+		$skilids = array_map (function($value){
+					return $value['skill_id'];
+		} , $userSkills);
+	}
 	?>
 	
 	<div class="col-md-9">
@@ -16,7 +22,7 @@
 				</div>
 				<div class="panel-body">
 					<div class='col-md-9'>
-					<form action="<?php echo base_url() ?>Admin/editEmpSave" name="editUser" id="editUser" method="post">
+					<form action="<?php echo base_url() ?>Admin/editEmpSave" name="editUser" id="editUser" method="post" enctype="multipart/form-data">
 						<fieldset>
 							<div class="form-group">
 								<label>First Name<em>*</em></label>
@@ -34,6 +40,36 @@
 							<div class="form-group">
 								<label>Username<em>*</em></label>
 						<input class="form-control" name="username" id="username" placeholder="Enter username" type="text" value="<?php echo $userInfo[0]->username; ?>" />
+							</div>
+							<div class="form-group">
+								<label>Phone<em>*</em></label>
+								<input class="required form-control" name="contact_phone" id="contact_phone" placeholder="Enter Contact Phone" type="text" value="<?php echo $userInfo[0]->contact_phone; ?>" >
+							</div>
+							<div class="form-group"> 
+								<label>Home address</label>
+								<textarea name="address" id="address" class="form-control"><?php echo $userInfo[0]->address; ?></textarea>
+							</div>
+							
+							<div class="form-group"> 
+								<label>Skills</label>
+								 <select class="form-control required chosen-select" id="user_skills_edit" name="user_skills[]" data-placeholder="Choose a Country..." multiple tabindex="2">
+								 <option value=""></option>
+								 <?php if(!empty($allskills)){
+									 foreach($allskills as $skillVal){
+									 ?>
+									<option value="<?php echo $skillVal->id;?>" <?php if(in_array($skillVal->id,$skilids)){ ?> selected <?php } ?>>
+									<?php echo $skillVal->skill_name;?> </option>
+									
+								 <?php
+									 }
+									}
+								 ?>
+								 </select>
+							</div>
+							<div class="form-group"> 
+								<label>Construction card</label>
+								<input type="file" class="form-control" name="construction_card" id="construction_card"/>
+								<input type="hidden" name="oldcard" value="<?php echo $userInfo[0]->construction_card; ?>" />
 							</div>
 							<div class="form-group">
 								<label for="role">Role </label>
@@ -87,5 +123,8 @@
 	</div>
 </div>
 <?php $this->load->view('includes/footer');?> 
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/frontend/chosen/chosen.css">
 <script src="<?php echo base_url(); ?>assets/frontend/js/jquery.validate.min.js" type="text/javascript"></script>
+<script src="<?php echo base_url(); ?>assets/frontend/chosen/chosen.jquery.js" type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>assets/frontend/js/editUser.js" type="text/javascript"></script>
+

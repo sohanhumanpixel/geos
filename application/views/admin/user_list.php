@@ -42,8 +42,9 @@
 						<td><?=$currentUser[0]->username?></td>
 						<td><?=$currentUser[0]->role_name?><em>(You)</em></td>
 						<td class="text-center">
-                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Admin/editemp/'.base64_encode(convert_uuencode($currentUser[0]->userId)); ?>"><i class="glyphicon  glyphicon-pencil"></i></a>
-                          <a class="btn btn-sm btn-danger deleteUser" href="javaScript:void(0);" data-userid="<?php echo $currentUser[0]->userId; ?>"><i class="glyphicon  glyphicon-trash"></i></a>
+						<a class="btn btn-sm btn-info" href="<?php echo base_url().'Admin/viewprofile/'.base64_encode(convert_uuencode($currentUser[0]->userId)); ?>" data-toggle="tooltip" title="View Profile"><i class="glyphicon glyphicon-search"></i></a>
+                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Admin/editemp/'.base64_encode(convert_uuencode($currentUser[0]->userId)); ?>" data-toggle="tooltip" title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                          <a class="btn btn-sm btn-danger deleteUser" href="javaScript:void(0);" data-userid="<?php echo $currentUser[0]->userId; ?>" data-toggle="tooltip" title="Delete"><i class="glyphicon glyphicon-trash"></i></a>
                       </td>
 					</tr>
 							<?php
@@ -59,8 +60,11 @@
 					  <td><?php echo $record->username ?></td>
                       <td><?php echo $record->role_name ?></td>
                       <td class="text-center">
-                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Admin/editemp/'.base64_encode(convert_uuencode($record->userId)); ?>"><i class="glyphicon  glyphicon-pencil"></i></a>
-                          <a class="btn btn-sm btn-danger deleteUser" href="javaScript:void(0);" data-userid="<?php echo $record->userId; ?>"><i class="glyphicon  glyphicon-trash"></i></a>
+						 <a class="btn btn-sm btn-info" href="<?php echo base_url().'Admin/viewprofile/'.base64_encode(convert_uuencode($record->userId)); ?>" data-toggle="tooltip" title="View More"><i class="glyphicon glyphicon-search"></i></a>
+						 
+                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Admin/editemp/'.base64_encode(convert_uuencode($record->userId)); ?>" data-toggle="tooltip" title="Edit"><i class="glyphicon  glyphicon-pencil"></i></a>
+						  
+                          <a class="btn btn-sm btn-danger deleteUser" href="javaScript:void(0);" data-userid="<?php echo $record->userId; ?>" data-toggle="tooltip" title="Delete"><i class="glyphicon  glyphicon-trash"></i></a>
                       </td>
                     </tr>
 					<?php 
@@ -80,3 +84,6 @@
 </div>
 <?php $this->load->view('includes/footer');?> 
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/frontend/js/common.js" charset="utf-8"></script>
+<script>
+	$('[data-toggle="tooltip"]').tooltip();
+</script>
