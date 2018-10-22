@@ -77,4 +77,112 @@ jQuery(document).ready(function(){
 			});
 		}
 	});
+	
+	/** 
+	*induction check box
+	*added date: 12-10-2018
+	*/
+	$("#is_induction").click(function() {
+    if($(this).is(":checked")) {
+        $(".inductionurl").show();
+		$("#induction_url").val($('#induction_url').data("urlval"));
+    } else {
+		$("#induction_url").val('');
+        $(".inductionurl").hide();
+		
+    }
+	});
+	
+	/**
+	 *@user Profile Pic Change model
+	 */
+	 $("#changephoto").click(function(){
+		 
+		 $("#editimgmodal").modal("show");
+		 var imgurl = $('#realPic').attr('src');
+		 $('#oldimg').attr('src',imgurl);
+	 });
+	 
+	 /**
+	  *@save User profile Images
+	  */
+	$("#changeimgform").on('submit',(function(e) {
+		e.preventDefault();
+		$(".modal-content").css('opacity','0.7');
+		$("#saveImg").text('updating...');
+		$("#saveImg").prop( "disabled", true );
+		  $.ajax({
+				url: baseURL + "Profile/ajax_editImageHtml",
+				type: "POST",
+				data:  new FormData(this),
+				contentType: false,
+				cache: false,
+				processData:false,
+				success: function(response) {
+					$(".modal-content").css('opacity','1');
+					$("#saveImg").text('Save');
+					$("#saveImg").prop( "disabled", false );
+					var responseA = JSON.parse(response);
+					if(responseA.status=='success')
+					{
+					 $("#changeimgform")[0].reset();
+					 //$("#successmmm").show();
+					 $('#realPic').attr('src',responseA.message);
+					 //$("#successmmm").text("Profile picture changed success");
+					 $('#editimgmodal').modal('hide');
+					}
+					else
+					{
+					 // invalid file format.
+					 $("#err").html(responseA.message).fadeIn();
+					}          
+				}
+			});
+			return false;
+	}));
+	
+	/**
+	 *@Emp Profile Pic Change model
+	 */
+	 $("#changephotoEmp").click(function(){
+		 $("#editimgmodalemp").modal("show");
+		 var imgurl = $('#realPic').attr('src');
+		 $('#oldimg').attr('src',imgurl);
+	 });
+	 
+	 $("#empchangeimgform").on('submit',(function(e) {
+		e.preventDefault();
+		$(".modal-content").css('opacity','0.7');
+		$("#empsaveImg").text('updating...');
+		$("#empsaveImg").prop( "disabled", true );
+		  $.ajax({
+				url: baseURL + "Admin/ajax_editImageHtml",
+				type: "POST",
+				data:  new FormData(this),
+				contentType: false,
+				cache: false,
+				processData:false,
+				success: function(response) {
+					$(".modal-content").css('opacity','1');
+					$("#saveImg").text('Save');
+					$("#saveImg").prop( "disabled", false );
+					var responseA = JSON.parse(response);
+					if(responseA.status=='success')
+					{
+					 $("#empchangeimgform")[0].reset();
+					 //$("#successmmm").show();
+					 $('#realPic').attr('src',responseA.message);
+					 //$("#successmmm").text("Profile picture changed success");
+					 $('#editimgmodalemp').modal('hide');
+					}
+					else
+					{
+					 // invalid file format.
+					 $("#err").html(responseA.message).fadeIn();
+					}          
+				}
+			});
+			return false;
+	}));
+	
 });

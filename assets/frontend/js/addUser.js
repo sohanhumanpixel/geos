@@ -59,4 +59,5 @@ $(document).ready(function(){
     					}
 			  }
 			});
+	$("#user_skills").chosen();
 });
