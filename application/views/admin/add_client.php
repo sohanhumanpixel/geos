@@ -2,7 +2,7 @@
 	<div class="row">
 	<?php $this->load->view('includes/left_sidebar');?>
 	
-	<div class="col-md-9">
+	<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -31,6 +31,15 @@
 							<div class="form-group">
 								<label>Phone Number<em>*</em></label>
 								<input class="form-control" name="phone" id="phone" placeholder="Enter client's phone number" type="text">
+							</div>
+							<div class="form-group">
+								<label>Company Name<em>*</em></label>
+								<input type="text" name="client" class="form-control" id="client" placeholder="Enter Company name">
+				 				<input type="hidden" name="client_name" id="clientname">
+							</div>
+							<div class="form-group">
+								<label>Notes</label>
+								<textarea id="notes" name="notes" rows="8" class="form-control"></textarea>
 							</div>
 						</fieldset>
 						
@@ -66,6 +75,64 @@
 	
 	</div>
 </div>
+<div class="modal fade" id="CompanyAddModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+	  <form action="<?php echo base_url() ?>Company/addAction" name="addCompany" id="addCompany" method="post">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Add New Company</h4>
+        </div>
+        <div class="modal-body">
+        	<fieldset>
+	        	<div class="form-group">
+					<label>Company Name<em>*</em></label>
+					<input class="form-control required" name="cname" id="cname" placeholder="Enter company name" type="text">
+				</div>
+				<div class="form-group">
+					<label>Company Owner<em>*</em></label>
+					<input class="form-control required" name="cowner" id="cowner" placeholder="Enter company owner name" type="text">
+				</div>
+				<div class="form-group">
+					<label>Company Website</label>
+					<input class="form-control" name="cweb" id="cweb" placeholder="Enter company website" type="text">
+				</div>
+				<div class="form-group">
+					<label>Email Address<em>*</em></label>
+					<input class="form-control required email" name="cemail" id="cemail" placeholder="Enter company email" type="text">
+				</div>
+				<div class="form-group">
+					<label>Phone Number</label>
+					<input class="form-control" name="cphone" id="cphone" placeholder="Enter company phone number" type="text">
+				</div>
+				<div class="form-group">
+					<label>Notes</label>
+					<textarea id="notes" name="notes" rows="8" class="form-control"></textarea>
+				</div>
+			</fieldset>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+            <button class="btn btn-success submiting"> Add </button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+		</form>
+      </div>
+      
+    </div>
+  </div>
 <?php $this->load->view('includes/footer');?> 
 <script src="<?php echo base_url(); ?>assets/frontend/js/jquery.validate.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/frontend/css/jquery-ui.css">
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/frontend/js/jquery-ui.js" charset="utf-8"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/frontend/js/common.js" charset="utf-8"></script>
 <script src="<?php echo base_url(); ?>assets/frontend/js/addClient.js" type="text/javascript"></script>
+<script src="<?=base_url('assets/vendor/summernote/summernote.js')?>"></script>
+<script>
+$(document).ready(function() {
+  $('#notes').summernote({
+	  height: 200
+  });
+});
+</script>

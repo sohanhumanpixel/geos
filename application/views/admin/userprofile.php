@@ -1,7 +1,7 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
-		<div class="col-md-9">
+		<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 					<?php
 					$userData = $profileData['userdata'];
@@ -25,6 +25,12 @@
                         <div class="profile-img">
                             <img src="<?php echo base_url(); ?>assets/images/profile/<?php echo $profileIamge; ?>" alt="" id="realPic" />
                         </div>
+                        <div class="profile-work" id="changephotoEmp">
+                            <a href="javaScript:void(0);">Change Photo</a></div>
+                        <div class="profile-work">
+                            <p>Address</p>
+                            <p><?php echo $userData[0]->address; ?></p>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="profile-head">
@@ -41,21 +47,6 @@
                                 </li>
                             </ul>
                         </div>
-                    </div>
-                    <div class="col-md-2">
-						<a href="<?php echo base_url().'Admin/editemp/'.base64_encode(convert_uuencode($currentUId));?>" class="btn btn-success">Edit Profile</a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-						<div class="profile-work" id="changephotoEmp">
-							<a href="javaScript:void(0);">Change Photo</a></div>
-                        <div class="profile-work">
-                            <p>Address</p>
-                            <p><?php echo $userData[0]->address; ?></p>
-                        </div>
-                    </div>
-                    <div class="col-md-8">
                         <div class="tab-content profile-tab" id="myTabContent">
                             <div class="tab-pane fade in active" id="abouttab" role="tabpanel" aria-labelledby="home-tab">
                                         <div class="row">
@@ -79,7 +70,7 @@
                                                 <label>Email</label>
                                             </div>
                                             <div class="col-md-6">
-												<p><?php echo $userData[0]->email; ?></p>
+                                                <p><?php echo $userData[0]->email; ?></p>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -92,44 +83,56 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
+                                                <label>Home Address</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><?php echo $userData[0]->address; ?></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
                                                 <label>Role</label>
                                             </div>
                                             <div class="col-md-6">
                                                 <p><?php echo $userData[0]->role_name; ?></p>
                                             </div>
                                         </div> 
-										<div class="row">
+                                        <div class="row">
                                             <div class="col-md-6">
                                                 <label>Construction card</label>
                                             </div>
                                             <div class="col-md-6">
-                                                <p><?php if($userData[0]->construction_card!=''){?>
-												<a href="<?php echo base_url().'assets/images/usercard/'.$userData[0]->construction_card; ?>">View</a><?php } ?></p>
+                                            <?php if($userData[0]->construction_card!=''){ ?>
+                                                <img class="constCardThumb" src="<?php echo base_url().'assets/images/usercard/'.$userData[0]->construction_card; ?>" width="100">
+                                            <?php } ?>
                                             </div>
                                         </div>
                             </div>
                             <div class="tab-pane fade" id="skillstabdata" role="tabpanel" aria-labelledby="profile-tab">
-								<div class="row">
-									
-									<?php 
-									if(!empty($Userskills)){
-										foreach($Userskills as $skillval){
-										?>
-									<div class="col-md-4">
-										<p><?php echo $skillval->skill_name; ?></p>
-									</div>
-									<?php
-										}									
-									}else{ ?>
-									<div class="col-md-6"> No skills added </div>
-									<?php
-									}
-									?>
-								</div>
+                                <div class="row">
+                                    
+                                    <?php 
+                                    if(!empty($Userskills)){
+                                        foreach($Userskills as $skillval){
+                                        ?>
+                                    <div class="col-md-4">
+                                        <p><?php echo $skillval->skill_name; ?></p>
+                                    </div>
+                                    <?php
+                                        }                                   
+                                    }else{ ?>
+                                    <div class="col-md-6"> No skills added </div>
+                                    <?php
+                                    }
+                                    ?>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>    
+                    <div class="col-md-2">
+						<a href="<?php echo base_url().'Admin/editemp/'.base64_encode(convert_uuencode($currentUId));?>" class="btn btn-success">Edit Profile</a>
+                    </div>
+                </div> 
 			</div>
 				
 				<!-- End New Profile -->
@@ -168,12 +171,22 @@
     </div>
   </div>
 <!-- End Image Modal -->
+<div id="constCardModal" class="modal modal-wide fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Construction Card</h4>
+        </div>
+         <div id="constP"></div>
+     </div>
+    </div>
+</div><!-- /.modal -->
 <style>
 .emp-profile{
     margin-top: 2%;
     margin-bottom: 3%;
     border-radius: 0.5rem;
-    background: #fff;
 }
 .profile-img{
     text-align: center;
@@ -181,6 +194,8 @@
 .profile-img img{
     width: 70%;
     height: 100%;
+    border: 1px solid #e2e2e2;
+    padding: 2px;
 }
 .profile-head h5{
     color: #333;
@@ -222,6 +237,11 @@
 .profile-tab p{
     font-weight: 600;
     color: #0062cc;
+}
+.profile-tab .row {
+    border-bottom: 1px solid #e2e2e2;
+    box-shadow: 0px 1px 0px 0px #fff;
+    padding: 5px;
 }
 </style>
 <?php $this->load->view('includes/footer');?> 

@@ -3,9 +3,15 @@
 	<?php $this->load->view('includes/left_sidebar');
 	
 	$SegmentArray = $this->uri->segment_array();
+	$emplIds = array();
+	if(!empty($employeeIds)){
+		$emplIds = array_map (function($value){
+					return $value->user_id;
+		} , $employeeIds);
+	}
 	?>
 	
-	<div class="col-md-9">
+	<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -23,7 +29,14 @@
 								<label>Group Name<em>*</em></label>
 								<input class="form-control" name="group_name" id="group_name" placeholder="Enter Group name" type="text" value="<?php echo $groupInfo[0]->group_name;?>" />
 							</div>
-							
+							<div class="form-group">
+								<label>Select Employees<em>*</em></label>
+								<select name="group_emp[]" class="form-control group_emp" data-placeholder="Select Employees" multiple>
+									<?php foreach($allEmployees as $employee){ ?>
+										<option value="<?=$employee->id?>" <?php if(in_array($employee->id, $emplIds)){ echo "selected"; } ?>><?=$employee->fname.' '.$employee->lname?></option>
+									<?php } ?>
+								</select>
+							</div>
 						</fieldset>
 						<div class="box-footer">
                             <input type="submit" class="btn btn-success" value="Submit" name="group_upate" />
@@ -58,19 +71,25 @@
 	</div>
 </div>
 <?php $this->load->view('includes/footer');?> 
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/frontend/chosen/chosen.css">
 <script src="<?php echo base_url(); ?>assets/frontend/js/jquery.validate.min.js" type="text/javascript"></script>
+<script src="<?php echo base_url(); ?>assets/frontend/chosen/chosen.jquery.js" type="text/javascript"></script>
 <script>
 $(document).ready(function(){
-	$( "#editGroup" ).validate({
-				rules: {
-				group_name: {
-  					required: true
-  				},
-				},
-				messages: {
-					group_name: "Please enter group name",
-
-			  }
-			});
+	$( "#addGroup" ).validate({
+		rules: {
+			"group_name": {
+				required: true
+			},
+			"group_emp[]": {
+				required: true
+			},
+		},
+		messages: {
+			"group_name": "Please enter group name",
+			"group_emp[]" : "Please select employees",
+        }
+	});
+	$(".group_emp").chosen();
 });
 </script>

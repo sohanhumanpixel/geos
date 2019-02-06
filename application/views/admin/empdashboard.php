@@ -1,7 +1,7 @@
 <div class="page-content">
 	<div class="row">
 	<?php $this->load->view('includes/left_sidebar');?>
-		<div class="col-md-9">
+		<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -12,8 +12,8 @@
 					<div class="col-lg-3 col-xs-6">
 						<div class="small-box bg-aqua">
 							<div class="inner">
-							  <h3>0</h3>
-							  <p>Total Your task</p>
+							  <h3><a href="<?=base_url()?>Employee/taskList" style="color: #fff"><?php echo $countTask;?></a></h3>
+							  <p>Total Task</p>
 							</div>
 						  </div>
 					</div>
@@ -57,7 +57,7 @@
         right: 'month,agendaWeek,agendaDay,listWeek'
       },
       eventLimit: true, // allow "more" link when too many events
-        events: baseURL + 'Employee/ajax_getLeaveList',
+        events: baseURL + 'Leave/ajax_getEmpLeave',
         selectable: true,
         selectHelper: true
     });

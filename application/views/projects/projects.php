@@ -1,7 +1,7 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
-		<div class="col-md-9">
+		<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -27,7 +27,7 @@
 							<thead>
 								<tr>
 								<th><span>Project Name</span></th>
-								<th><span>Client Name</span></th>
+								<th><span>Company Name</span></th>
 								<th><span>Site Address</span></th>
 								<th><span>Project Manager</span></th>
 								<th>Action</th>
@@ -42,13 +42,14 @@
                         {
                     ?>	
 					<tr>
-                      <td><?php echo $project->project_name ?></td>
-                      <td><?php echo $project->fname.' '.$project->lname ?></td>
+                      <td><a href="<?=base_url()?>Projects/History/<?=$project->id?>"><?php echo $project->project_name ?></a></td>
+                      <td><?php echo $project->company_name ?></td>
                       <td><?php echo $project->project_address ?></td>
                       <td><?php echo $project->firstname.' '.$project->lastname ?></td>
                       <td class="text-center">
-                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Projects/edit/'.base64_encode(convert_uuencode($project->id)); ?>"><i class="glyphicon  glyphicon-pencil"></i></a>
-                          <a class="btn btn-sm btn-danger deleteProject" href="javaScript:void(0);" data-userid="<?php echo $project->id; ?>"><i class="glyphicon  glyphicon-trash"></i></a>
+                      	  <a class="btn btn-sm btn-success" href="<?php echo base_url().'Projects/History/'.$project->id ?>" data-toggle="tooltip" title="View"><i class="glyphicon  glyphicon-eye-open"></i></a>
+                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Projects/edit/'.base64_encode(convert_uuencode($project->id)); ?>" data-toggle="tooltip" title="Edit"><i class="glyphicon  glyphicon-pencil"></i></a>
+                          <a class="btn btn-sm btn-danger deleteProject" href="javaScript:void(0);" data-userid="<?php echo $project->id; ?>" data-toggle="tooltip" title="Delete"><i class="glyphicon  glyphicon-trash"></i></a>
                       </td>
                     </tr>
 					<?php 

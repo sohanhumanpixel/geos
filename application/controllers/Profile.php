@@ -23,10 +23,19 @@ Class Profile extends BaseController {
 	 
     public function index(){
      	$this->load->model('users');
+		$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
      	//$userdata = $this->users->getUserInfo($this->vendorId);
 		$data['profileData'] = $this->users->userProfileData($this->vendorId);
      	//$data['userInfo'] = $userdata;
         $data['title'] = 'Edit Profile';
+        if($this->isAdmin() == TRUE){
+        	$data['isAdmin'] = FALSE;
+        }else{
+        	$data['isAdmin'] = TRUE;
+        }
+        $data['allEmployees']= $this->users->getAllEmployee();
+        $data['excludedProjects'] = $this->users->getExcludedProjects();
+        $this->session->set_userdata('referred_from', current_url());
 		$this->load->view('includes/header',$data);
 		$this->load->view('admin/myprofile');
     }
@@ -98,6 +107,8 @@ Class Profile extends BaseController {
         }
         public function password(){
 	        $data['title'] = 'Change Password';
+	        $this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/change_password');
         }
@@ -174,5 +185,77 @@ Class Profile extends BaseController {
 				}
 			}
 			die;
+		}
+
+		function ajax_ExcludeProjectSave()
+		{
+			$this->load->model('users');
+			$employee_id = $_POST['employee_name'];
+			$client_id   = $_POST['client_id'];
+			$project_ids = implode(',', $_POST['project_name']);
+			$data = array(
+				'employee_id' 	=> $employee_id,
+				'client_id'   	=> $client_id,
+				'project_id'  	=> $project_ids,
+				'excluded_by' 	=> $this->vendorId,
+				'excluded_date' => date("Y-m-d H:i:s")
+			);
+			$check = $this->users->checkForExcludedProjectEntry($employee_id);
+			if(!empty($check)){
+				$response = array('status'=>'already_exists','msg'=>'This employee already added for excluded projects');
+	        	echo json_encode($response);
+	        	die;
+			}
+			$result = $this->users->saveExludedProjects($data);
+			if($result!=''){
+	        	$response = array('status'=>'success');
+	        	echo json_encode($response);
+	        	die;
+	        }else{
+	            $response = array('status'=>'error');
+	        	echo json_encode($response);
+	        	die;
+	        }
+		}
+		function deleteExcludeProjects()
+		{
+			$this->load->model('users');
+			$id = $_POST['id'];
+			$result = $this->users->deleteExcludedProjects($id);
+			return true;
+		}
+		function editExcludeProjects()
+		{
+			$this->load->model('users');
+			$this->load->model('project_type');
+			$id = $_POST['id'];
+			$result = $this->users->editExcludedProjects($id);
+			$resul2 = $this->project_type->getProjectsByClient($result[0]->client_id);
+			$response = array("data"=>$result,'html'=>$resul2);
+			echo json_encode($response);
+			die();
+		}
+		function ajax_ExcludeProjectUpdate()
+		{
+			$this->load->model('users');
+			$edit_id     = $_POST['edit_id'];
+			$employee_id = $_POST['editemployee_name'];
+			$client_id   = $_POST['editclient_id'];
+			$project_ids = implode(',', $_POST['editproject_name']);
+			$data = array(
+				'employee_id' 	=> $employee_id,
+				'client_id'   	=> $client_id,
+				'project_id'  	=> $project_ids
+			);
+			$result = $this->users->updateExludedProjects($data,$edit_id);
+			if($result==true){
+	        	$response = array('status'=>'success');
+	        	echo json_encode($response);
+	        	die;
+	        }else{
+	            $response = array('status'=>'error');
+	        	echo json_encode($response);
+	        	die;
+	        }
 		}
     }

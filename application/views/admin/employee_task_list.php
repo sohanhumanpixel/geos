@@ -1,11 +1,11 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
-		<div class="col-md-9">
+		<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
-						<h3>Your Group List</h3>
+						<h3>My Task List</h3>
 					</div>
 					<!--<div class="panel-options">
 					  <a href="<?php echo base_url(); ?>UserGroups/addGroup" class="btn btn-success">Add New Group</a>
@@ -23,23 +23,72 @@
                     <?php echo $this->session->flashdata('success'); ?>
                 </div>
                 <?php } ?>
+                <?php 
+                foreach($taskLists as $key => $taskList){
+                	$tId = $taskList->task_id;
+					$q = $this->db->query("SELECT id, title, abbr FROM tasks WHERE id=$tId");
+					$r = $q->result_array();
+					$taskLists[$key]->task_names = $r[0]['title'].' '.$r[0]['abbr'];
+				}
+				//echo "<pre>"; print_r($taskLists);echo "</pre>";
+                ?>
 						<table class="table user-list">
 							<thead>
 								<tr>
-									<th><span>Task name</span></th>
-									<th><span>Task Type</span></th>
+									<th><span>Task Assigned</span></th>
+									<th><span>Under Project</span></th>
+									<th><span>Schedule Date</span></th>
+									<th><span>Assigned By</span></th>
+									<th><span>Status</span></th>
+									<th>Actions</th>
 								</tr>
 							</thead>
 							<tbody>
-							<tr>
-								<td colspan="2">Comming soon!!</td>
-							</tr>
+							<?php if(!empty($taskLists)){
+							foreach($taskLists as $taskList){ ?>
+								<tr>
+									<td><?=$taskList->task_names?></td>
+									<td><?=$taskList->project_name?></td>
+									<td><?=$taskList->schedule_date?></td>
+									<td><?=$taskList->creator_name?></td>
+									<td><?php if($taskList->is_complete==1){
+										echo "<span style='color:green;'>Complete</span>";
+									}elseif($taskList->is_complete==0 && $taskList->partial_complete==1 && $taskList->start_task==0){
+										echo "<span style='color:orange;'>Partial Complete</span>";
+									}elseif($taskList->is_complete==0 && $taskList->start_task==1){
+										echo "<span style='color:#0171ff;animation: blink 1s linear infinite;'>Task in Progress</span>";
+									}else{
+										echo "<span style='color:red;'>Incomplete</span>";
+									} ?></td>
+									<td>
+										<a href="<?=base_url('Employee/taskView/'.base64_encode(convert_uuencode($taskList->task_id)).'/'.base64_encode(convert_uuencode($taskList->id)))?>">
+											<button class="btn btn-success">View</button>
+										</a>
+									</td>
+								</tr>
+							<?php } ?>
+								
+							<?php }else{ ?>
+								<tr>
+									<td colspan="2">No Tasks</td>
+								</tr>
+							<?php } ?>
 							</tbody>
 						</table>
+					</div>
+					<div class="box-footer clearfix">
+						<?php echo $this->pagination->create_links(); ?>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+<style type="text/css">
+	@keyframes blink{
+	0%{opacity: 1;}
+	50%{opacity: .5;}
+	100%{opacity: 1;}
+	}
+</style>
 <?php $this->load->view('includes/footer');?> 

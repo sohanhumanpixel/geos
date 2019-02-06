@@ -34,6 +34,8 @@ class UserGroups extends BaseController {
 			$count = $this->groups->groupListingCount($searchText);
 			$returns = $this->paginationCompress ( "UserGroups/grouplist", $count, 10 );
 			$data['groupRecords'] = $this->groups->GroupListing($searchText, $returns["page"], $returns["segment"]);
+			$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$this->load->view('includes/header',$data);
 			$this->load->view('UserGroups/admin_group_list');
 		}
@@ -51,6 +53,9 @@ class UserGroups extends BaseController {
 			
         }else{
 			$data['title'] = 'Add Group';
+			$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
+			$data['allEmployees']= $this->users->getAllEmployee();
 			$this->load->view('includes/header',$data);
 			$this->load->view('UserGroups/admin_add_group');
 		}
@@ -64,7 +69,7 @@ class UserGroups extends BaseController {
 	public function addNewGroup()
     {
 		$this->load->library('form_validation');
-		$this->form_validation->set_rules('group_name','First name','trim|required|max_length[128]');
+		$this->form_validation->set_rules('group_name','Group name','trim|required|max_length[128]');
 		if($this->form_validation->run() == FALSE)
 		{
 			$this->addGroup();
@@ -72,11 +77,15 @@ class UserGroups extends BaseController {
 		else
 		{
 			$group_name = $this->input->post('group_name');
-			
-			$userInfo = array('group_name'=>$group_name, 'created_at'=>date('Y-m-d H:i:s'));
+			$group_empl = $this->input->post('group_emp');
+			$userInfo = array('group_name'=>$group_name, 'created_by'=>$this->vendorId, 'created_at'=>date('Y-m-d H:i:s'));
 			
 			$this->load->model('groups');
 			$result = $this->groups->addNewGroup($userInfo);
+			foreach($group_empl as $empl){
+				$groupInfo = array('group_id'=>$result,'user_id'=>$empl);
+				$this->groups->addEmplGroup($groupInfo);
+			}
 			if($result > 0)
 			{
 				$this->session->set_flashdata('success', 'New Group created successfully');
@@ -117,9 +126,15 @@ class UserGroups extends BaseController {
 			if($this->input->post('group_upate')){
 				$realgroupId = convert_uudecode(base64_decode($groupId));
 				$groupName = $this->input->post('group_name');
+				$groupEmpl = $this->input->post('group_emp');
 				$udateGroupInfo = array('group_name'=>$groupName,'updated_by'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
-			
+				
 				$result = $this->groups->updateGroup($udateGroupInfo,$realgroupId);
+				$this->db->query("DELETE FROM user_groups WHERE group_id=$realgroupId");
+				foreach($groupEmpl as $empl){
+					$groupInfo = array('group_id'=>$realgroupId,'user_id'=>$empl);
+					$this->groups->addEmplGroup($groupInfo);
+				}
 			 if($result == true)
                {
 				$this->session->set_flashdata('success', 'Group has been update successfully');
@@ -133,6 +148,10 @@ class UserGroups extends BaseController {
 			}
 			
 			$data['groupInfo'] = $groupdata;
+			$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
+			$data['allEmployees']= $this->users->getAllEmployee();
+			$data['employeeIds']  =$this->groups->getEmployeeGroupIds(convert_uudecode(base64_decode($groupId)));
 			$data['title'] = 'Update Group';
 			$this->load->view('includes/header',$data);
 			$this->load->view('UserGroups/admin_edit_group');

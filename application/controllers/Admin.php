@@ -14,6 +14,7 @@ Class Admin extends BaseController {
 		$this->load->library('form_validation');
 		// Load session library
 		$this->load->library('session');
+
 		$this->isLoggedIn(); 
 	}
 	public function index() {
@@ -29,6 +30,11 @@ Class Admin extends BaseController {
         }
         $data['announcements'] = $this->announcements->getAnns($access);
 		$data['title'] = 'Dashboard';
+		$this->load->model('project_type');
+		$data['projectCount'] = $this->project_type->projectCount();
+        $this->load->model('users');
+		$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
+		$data['employeeCount'] = $this->users->employeeCount();
 		$this->load->view('includes/header',$data);
 		$this->load->view('admin/dashboard');
 	}
@@ -44,6 +50,7 @@ Class Admin extends BaseController {
             $this->loadThis();
         }else{
 			$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$this->load->library('pagination');
 			$searchText = '';
 			$count = $this->users->userListingCount($searchText);
@@ -55,6 +62,7 @@ Class Admin extends BaseController {
                 $access = '';
             }
 			$data['userRecords'] = $this->users->userListing($searchText, $returns["page"], $returns["segment"],$this->vendorId,$access);
+			$this->session->set_userdata('referred_from', current_url());
 			$data['title'] = 'User List';
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/user_list');
@@ -73,6 +81,7 @@ Class Admin extends BaseController {
             $this->loadThis();
         }else{
 			$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$data['roles'] = $this->users->getUserRoles();
 			$data['title'] = 'Add New Employee';
 			$data['allskills'] = $this->users->getAllSkills();
@@ -164,20 +173,19 @@ Class Admin extends BaseController {
 	 */
 	 
 	public function editemp($userId = NULL){
-		if($this->isTicketter() == TRUE)
-        {
-            $this->loadThis();
-        }else{
+		$this->load->model('users');
 			if($userId == null)
             {
                 redirect('employee_list');
             }
-			$this->load->model('users');
+			
             if($this->role!=1){
                 $access = 'admin';
             }else{
                 $access = '';
             }
+            $data['referred_from'] = $this->session->userdata('referred_from');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$data['roles'] = $this->users->getUserRoles($access);
 			$data['allskills'] = $this->users->getAllSkills();
 			$userdata = $this->users->getUserInfo(convert_uudecode(base64_decode($userId)));
@@ -190,7 +198,6 @@ Class Admin extends BaseController {
 			
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/edit_emp');
-		}
 		
 	}
 	
@@ -200,89 +207,90 @@ Class Admin extends BaseController {
      */
     public function editEmpSave()
     {
-        if($this->isTicketter() == TRUE)
+		$this->load->library('form_validation');
+        $referred_from = $this->session->userdata('referred_from');
+        $userId = $this->input->post('userId');
+        
+        $this->form_validation->set_rules('fname','First name','trim|required|max_length[128]');
+		$this->form_validation->set_rules('lname','Last name','trim|required|max_length[128]');
+        $this->form_validation->set_rules('email','Email','trim|required|valid_email|max_length[128]');
+        $this->form_validation->set_rules('role','Role','trim|required|numeric');
+        $this->form_validation->set_rules('username','Username','required');
+        
+        if($this->form_validation->run() == FALSE)
         {
-            $this->loadThis();
+            $this->editemp(base64_encode(convert_uuencode($userId)));
         }
         else
         {
+			$this->load->model('users');
 			
-            $this->load->library('form_validation');
-            
-            $userId = $this->input->post('userId');
-            
-            $this->form_validation->set_rules('fname','First name','trim|required|max_length[128]');
-			$this->form_validation->set_rules('lname','Last name','trim|required|max_length[128]');
-            $this->form_validation->set_rules('email','Email','trim|required|valid_email|max_length[128]');
-            $this->form_validation->set_rules('role','Role','trim|required|numeric');
-            $this->form_validation->set_rules('username','Username','required');
-            
-            if($this->form_validation->run() == FALSE)
+            $fname = ucwords(strtolower($this->input->post('fname')));
+			$lname = ucwords(strtolower($this->input->post('lname')));
+            $email = $this->input->post('email');
+            $username = $this->input->post('username');
+            $roleId = $this->input->post('role');
+            $skillsInput = $this->input->post('user_skills');
+			
+			if($_FILES['construction_card']['name']!=''){
+				//Upload
+				$upload_path = "assets/images/usercard/";
+				$imagetype = $_FILES['construction_card']['type'];
+				$filename = $_FILES['construction_card']['name'];
+				$tempname = $_FILES["construction_card"]["tmp_name"];
+				$t = preg_replace('/\s+/', '', time());
+				$fileName = $t . ''.str_replace(' ','',$filename);
+				$moved =  move_uploaded_file($tempname,$upload_path.''.$fileName);
+				if( $moved ) {
+					$oldcons = $this->input->post('oldcard');
+					$constcartName = $fileName;
+					($oldcons!='') ? unlink($upload_path.''.$oldcons): '';
+				}
+			}else{
+				$constcartName = '';
+			}
+			
+			
+            $userInfo = array();
+            $password = '';
+            if(empty($password))
             {
-                $this->editemp(base64_encode(convert_uuencode($userId)));
+            	if($constcartName!=""){
+                    $userInfo = array('email'=>$email, 'role_id'=>$roleId, 'fname'=> $fname,'lname'=> $lname,'username'=>$username,'contact_phone'=>$this->input->post('contact_phone'), 'address'=>$this->input->post('address'),'construction_card'=>$constcartName, 'updatedBy'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
+                }else{
+                	$userInfo = array('email'=>$email, 'role_id'=>$roleId, 'fname'=> $fname,'lname'=> $lname,'username'=>$username,'contact_phone'=>$this->input->post('contact_phone'), 'address'=>$this->input->post('address'), 'updatedBy'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
+                }
             }
             else
             {
-				$this->load->model('users');
-				
-                $fname = ucwords(strtolower($this->input->post('fname')));
-				$lname = ucwords(strtolower($this->input->post('lname')));
-                $email = $this->input->post('email');
-                $username = $this->input->post('username');
-                $roleId = $this->input->post('role');
-                $skillsInput = $this->input->post('user_skills');
-				
-				if($_FILES['construction_card']['name']!=''){
-					//Upload
-					$upload_path = "assets/images/usercard/";
-					$imagetype = $_FILES['construction_card']['type'];
-					$filename = $_FILES['construction_card']['name'];
-					$tempname = $_FILES["construction_card"]["tmp_name"];
-					$t = preg_replace('/\s+/', '', time());
-					$fileName = $t . ''.str_replace(' ','',$filename);
-					$moved =  move_uploaded_file($tempname,$upload_path.''.$fileName);
-					if( $moved ) {
-						$oldcons = $this->input->post('oldcard');
-						$constcartName = $fileName;
-						($oldcons!='') ? unlink($upload_path.''.$oldcons): '';
+            	if($constcartName!=""){
+                    $userInfo = array('email'=>$email, 'password'=>md5($password), 'role_id'=>$roleId,'fname'=> $fname,'lname'=> $lname,'username'=>$username, 'updatedBy'=>$this->vendorId,'contact_phone'=>$this->input->post('contact_phone'),'address'=>$this->input->post('address'),'construction_card'=>$constcartName,'updated_at'=>date('Y-m-d H:i:s'));
+                }else{
+                	$userInfo = array('email'=>$email, 'password'=>md5($password), 'role_id'=>$roleId,'fname'=> $fname,'lname'=> $lname,'username'=>$username, 'updatedBy'=>$this->vendorId,'contact_phone'=>$this->input->post('contact_phone'),'address'=>$this->input->post('address'),'updated_at'=>date('Y-m-d H:i:s'));
+                }
+            }
+            
+            $result = $this->users->editUser($userInfo, $userId);
+            
+            if($result == true)
+            {
+				if(!empty($skillsInput)){
+					//First delete user skills then need to inseret
+					$this->db->query("DELETE FROM users_skills WHERE user_id = $userId");
+					foreach($skillsInput as $skill){
+						$this->db->query("INSERT INTO users_skills ( user_id, skill_id) VALUES ('$userId', '$skill')");
 					}
 				}
-				
-				
-                $userInfo = array();
-                $password = '';
-                if(empty($password))
-                {
-                    $userInfo = array('email'=>$email, 'role_id'=>$roleId, 'fname'=> $fname,'lname'=> $lname,'username'=>$username,'contact_phone'=>$this->input->post('contact_phone'), 'address'=>$this->input->post('address'),'construction_card'=>$constcartName, 'updatedBy'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
-                }
-                else
-                {
-                    $userInfo = array('email'=>$email, 'password'=>md5($password), 'role_id'=>$roleId,'fname'=> $fname,'lname'=> $lname,'username'=>$username, 'updatedBy'=>$this->vendorId,'contact_phone'=>$this->input->post('contact_phone'),'address'=>$this->input->post('address'),'construction_card'=>$constcartName,'updated_at'=>date('Y-m-d H:i:s'));
-                }
-                
-                $result = $this->users->editUser($userInfo, $userId);
-                
-                if($result == true)
-                {
-					if(!empty($skillsInput)){
-						//First delete user skills then need to inseret
-						$this->db->query("DELETE FROM users_skills WHERE user_id = $userId");
-						foreach($skillsInput as $skill){
-							$this->db->query("INSERT INTO users_skills ( user_id, skill_id) VALUES ('$userId', '$skill')");
-						}
-					}
-					
-                    $this->session->set_flashdata('success', 'User updated successfully');
-					redirect('employee_list');
-                }
-                else
-                {
-                    $this->session->set_flashdata('error', 'User updation failed');
-					 redirect('employee_list');
-                }
-                
-               
+                $this->session->set_flashdata('success', 'User updated successfully');
+				redirect($referred_from);
             }
+            else
+            {
+                $this->session->set_flashdata('error', 'User updation failed');
+				 redirect($referred_from);
+            }
+            
+           
         }
     }
 	
@@ -359,6 +367,7 @@ Class Admin extends BaseController {
 	 public function roleList(){
 		$data['title'] = 'Admin Role List';
 		$this->load->model('users');
+		$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 		$data['roles'] = $this->users->getUserRoles();
 		$this->load->view('includes/header',$data);
 		$this->load->view('admin/admin_role_list');
@@ -377,7 +386,7 @@ Class Admin extends BaseController {
 			$data['title'] = 'User Profile';
 			$realuserId = convert_uudecode(base64_decode($userId));
 			$this->load->model('users');
-			
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$data['profileData'] = $this->users->userProfileData($realuserId);
 			//echo '<pre>';
 			//print_r($userData);
@@ -400,6 +409,7 @@ Class Admin extends BaseController {
 		}else{
 			$realuserId = convert_uudecode(base64_decode($userId));
 			$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$data['title'] = 'User Profile';
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/addskillstemp');
@@ -463,5 +473,13 @@ Class Admin extends BaseController {
 			
 	}	
 	
+	public function get_ajaxUsers()
+	{
+		$this->load->model('users');
+	  	$search = $_REQUEST['q'];
+		$users = $this->users->getAllLiveUsers($search);
+	  	echo json_encode($users);
+		die;
+	}
 }
 ?>

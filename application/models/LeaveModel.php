@@ -11,6 +11,13 @@ class LeaveModel extends CI_Model {
         return count($query->result());
     }
 	
+	function LeaveCountAll()
+    {
+        $this->db->select('emp_leave.id');
+        $this->db->from('emp_leave');
+        $query = $this->db->get();
+        return count($query->result());
+    }
 	/*
 	 *@get Leavetype
 	 */
@@ -28,16 +35,28 @@ class LeaveModel extends CI_Model {
 	 */
 	 
 	 function leaveListing($page, $segment,$empId){
-		$this->db->select("emp_leave.*,leave_typetbl.leave_type_name");
+		$this->db->select("emp_leave.*,leave_typetbl.leave_type_name,u.fname,u.lname");
         $this->db->from("emp_leave");
 		 $this->db->join('leave_type as leave_typetbl', 'leave_typetbl.id = emp_leave.leave_type','left');
+		 $this->db->join('users as u', 'emp_leave.emp_id = u.id','left');
 		 $this->db->where('emp_leave.emp_id', $empId);
+		 $this->db->order_by("emp_leave.leave_from_date","desc");
 		 
         $this->db->limit($page, $segment);
         $query = $this->db->get();
 		return $query->result();
 	 }
 	
+	function leaveListingAll($page, $segment){
+		$this->db->select("emp_leave.*,leave_typetbl.leave_type_name,CONCAT(u.fname,' ',u.lname) as employee_name");
+        $this->db->from("emp_leave");
+		 $this->db->join('leave_type as leave_typetbl', 'leave_typetbl.id = emp_leave.leave_type','left');
+		 $this->db->join('users as u', 'emp_leave.emp_id = u.id','left');
+		 $this->db->order_by("emp_leave.leave_from_date","desc");
+        $this->db->limit($page, $segment);
+        $query = $this->db->get();
+		return $query->result();
+	 }
 	/**
 	 *Add Schedule data
 	 *date; 15 OCT, 2018
@@ -60,6 +79,14 @@ class LeaveModel extends CI_Model {
         return $query->result();
 	}
 	
+	function getLeaveInfo($leaveId){
+		$this->db->select("el.*,lt.leave_type_name");
+        $this->db->from("emp_leave as el");
+        $this->db->join("leave_type as lt","el.leave_type=lt.id");
+		$this->db->where('el.id', $leaveId);
+		$query = $this->db->get();
+        return $query->result();
+	}
 	/**
 	 *@update schedule data from here
 	 */
@@ -99,7 +126,20 @@ class LeaveModel extends CI_Model {
         $query = $this->db->get();
         return count($query->result());
 	 }
-	 
+	 function upcomingLeaveCountAll($startdate){
+		$this->db->select('emp_leave.id');
+        $this->db->from('emp_leave');
+        $this->db->where('emp_leave.leave_from_date>=',$startdate);
+        $query = $this->db->get();
+        return count($query->result());
+	 }
+	 function pastLeaveCountAll($startdate){
+		$this->db->select('emp_leave.id');
+        $this->db->from('emp_leave');
+        $this->db->where('emp_leave.leave_from_date<',$startdate);
+        $query = $this->db->get();
+        return count($query->result());
+	 }
 	 /**
 	 *Fetch employee upcomming Leave
 	 *created date; 17-10-2018
@@ -111,11 +151,44 @@ class LeaveModel extends CI_Model {
 		 $this->db->join('leave_type as leave_typetbl', 'leave_typetbl.id = emp_leave.leave_type','left');
 		 $this->db->where('emp_leave.emp_id', $empId);
 		 $this->db->where('emp_leave.leave_from_date >=',$startDatefrom);
+		 $this->db->order_by("emp_leave.leave_from_date","desc");
 		 
         $this->db->limit($page, $segment);
         $query = $this->db->get();
 		return $query->result();
 	 }
-	
+	 
+	 function upcomingleaveListingAll($page, $segment,$startDatefrom){
+		$this->db->select("emp_leave.*,leave_typetbl.leave_type_name,CONCAT(u.fname,' ',u.lname) as employee_name");
+        $this->db->from("emp_leave");
+		 $this->db->join('leave_type as leave_typetbl', 'leave_typetbl.id = emp_leave.leave_type','left');
+		 $this->db->join('users as u', 'emp_leave.emp_id = u.id','left');
+		 $this->db->where('emp_leave.leave_from_date >=',$startDatefrom);
+		 $this->db->order_by("emp_leave.leave_from_date","desc");
+		 
+        $this->db->limit($page, $segment);
+        $query = $this->db->get();
+		return $query->result();
+	 }
+
+	 function pastleaveListingAll($page, $segment,$startDatefrom){
+		$this->db->select("emp_leave.*,leave_typetbl.leave_type_name,CONCAT(u.fname,' ',u.lname) as employee_name");
+        $this->db->from("emp_leave");
+		 $this->db->join('leave_type as leave_typetbl', 'leave_typetbl.id = emp_leave.leave_type','left');
+		 $this->db->join('users as u', 'emp_leave.emp_id = u.id','left');
+		 $this->db->where('emp_leave.leave_from_date <',$startDatefrom);
+		 $this->db->order_by("emp_leave.leave_from_date","desc");
+		 
+        $this->db->limit($page, $segment);
+        $query = $this->db->get();
+		return $query->result();
+	 }
+
+	 function leaveAction($recordId,$editSdata)
+	 {
+	 	$this->db->where('id', $recordId);
+		$updateSt = $this->db->update('emp_leave',$editSdata);
+		return $updateSt;
+	 }
 }
 ?>

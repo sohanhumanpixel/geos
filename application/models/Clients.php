@@ -36,9 +36,10 @@ class Clients extends CI_Model {
         return count($query->result());
     }
     public function getClients($searchText = '', $page, $segment) {
-        $this->db->select("c.*, User.fname as firstname,User.lname as lastname");
+        $this->db->select("c.*, User.fname as firstname,User.lname as lastname,comp.company_name");
         $this->db->from("clients as c");
         $this->db->join('users as User', 'User.id = c.created_by','left');
+        $this->db->join('companies as comp', 'comp.id = c.company','left');
         $this->db->where('c.isDeleted',0);
         $this->db->order_by("c.id", "desc");
         $this->db->limit($page, $segment);
@@ -71,6 +72,27 @@ class Clients extends CI_Model {
     {
     	$this->db->select("id,fname,lname");
         $this->db->from("clients");
+        $this->db->where('isDeleted',0);
+        $query = $this->db->get();
+
+        return $query->result();
+    }
+    public function getLiveClients($k)
+    {
+        $this->db->select("id,CONCAT(fname,' ',lname) as label");
+        $this->db->from("clients");
+        $this->db->where("CONCAT(fname,' ',lname) LIKE '%$k%'");
+        $this->db->where('isDeleted',0);
+        $query = $this->db->get();
+
+        return $query->result();
+    }
+    public function getClientsByCompany($id)
+    {
+        $this->db->select("*");
+        $this->db->from("clients");
+        $this->db->where("company",$id);
+        $this->db->where("isDeleted",0);
         $query = $this->db->get();
 
         return $query->result();

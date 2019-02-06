@@ -34,6 +34,8 @@ Class Documents extends BaseController {
             $returns = $this->paginationCompress ( "Documents", $count, 10 );
             $data['documentData'] = $this->documentModel->getDocuments($returns["page"], $returns["segment"]);
 			$data['title'] = 'Document';
+			$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$this->load->view('includes/header',$data);
 			$this->load->view('documents/list_document_temp');
         }
@@ -47,6 +49,8 @@ Class Documents extends BaseController {
             $this->loadThis();
         }else{
     		$data['title'] = "Upload New Document";
+    		$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
     		$this->load->view('includes/header',$data);
     		$this->load->view('documents/add_document');
         }
@@ -114,6 +118,8 @@ Class Documents extends BaseController {
 	    	$data['title'] = 'Edit Documents';
 	    	$this->load->model('documentModel');
 	    	$announcement = $this->documentModel->getDocumentById(convert_uudecode(base64_decode($id)));
+	    	$this->load->model('users');
+			$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 	    	$data['editDocumentData'] = $announcement;
 	    	$this->load->view('includes/header',$data);
 	    	$this->load->view('documents/edit_document');

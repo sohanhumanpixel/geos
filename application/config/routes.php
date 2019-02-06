@@ -61,6 +61,17 @@ $route['addNewEmployee'] = "Admin/add_new_employee";
 $route['forgot_password'] = 'User/forgot_password';
 $route['UserGroups/grouplist/(:num)'] = "UserGroups/grouplist/$1";
 $route['UserGroups/grouplist'] = "UserGroups/grouplist";
+$route['Announcement'] = "Announcement/index";
+$route['Announcement/(:num)'] = "Announcement/index/$1";
+$route['Client'] = "Client/index";
+$route['Client/(:num)'] = "Client/index/$1";
+$route['Projects'] = "Projects/index";
+$route['Projects/(:num)'] = "Projects/index/$1";
+$route['Company'] = "Company/index";
+$route['Company/(:num)'] = "Company/index/$1";
+$route['ChangePassword'] = "Profile/password";
+$route['TaskList'] = "TaskList/index";
+$route['TaskList/(:num)'] = 'TaskList/index/$1';
 /** Employees Dashboard*/
 $route['Employee/dashboard'] = "Employee/index";
 $route['404_override'] = '';

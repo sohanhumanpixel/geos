@@ -1,7 +1,7 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
-		<div class="col-md-10">
+		<div class="col-md-9">
 			<section class="content-header">
 			  <h1>
 				Access Denied

@@ -116,5 +116,24 @@ class Groups extends CI_Model {
         $query = $this->db->get();
         return count($query->result());
 	}
+    function addEmplGroup($data)
+    {
+        $this->db->trans_start();
+        $this->db->insert('user_groups', $data);
+        
+        $insert_id = $this->db->insert_id();
+        
+        $this->db->trans_complete();
+        
+        return $insert_id;
+    }
+    function getEmployeeGroupIds($id)
+    {
+        $this->db->select('id,user_id');
+        $this->db->from('user_groups');
+        $this->db->where('group_id', $id);
+        $query = $this->db->get();
+        return $query->result();
+    }
 }
 ?>

@@ -1,16 +1,19 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?>
-		<div class="col-md-7">
-		<div id="myCarousel" class="carousel slide" data-ride="carousel">
-    <!-- Indicators -->
+		<div class="col-md-10 padding-left-right">
+		<div class="heading_title">
+		   <h2>Hello Adam!</h2>
+		</div>
+		<!--<div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators 
     <ol class="carousel-indicators">
       <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
       <li data-target="#myCarousel" data-slide-to="1"></li>
       <li data-target="#myCarousel" data-slide-to="2"></li>
     </ol>
 
-    <!-- Wrapper for slides -->
+    <!-- Wrapper for slides
     <div class="carousel-inner" role="listbox">
       <div class="item active">
         <img src="<?php echo base_url();?>assets/images/home-slider-bg1.jpg" alt="" >
@@ -33,7 +36,7 @@
       </div>
     </div>
 
-    <!-- Left and right controls -->
+    <!-- Left and right controls 
     <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
       <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
       <span class="sr-only">Previous</span>
@@ -42,7 +45,7 @@
       <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
       <span class="sr-only">Next</span>
     </a>
-</div>
+</div>-->
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -53,16 +56,16 @@
 					<div class="col-lg-3 col-xs-6">
 						<div class="small-box bg-aqua">
 							<div class="inner">
-							  <h3>150</h3>
-							  <p>Total Users</p>
+							  <h3><?=$projectCount?></h3>
+							  <p>Number of Projects</p>
 							</div>
 						  </div>
 					</div>
 					<div class="col-lg-3 col-xs-6">
 						<div class="small-box bg-green">
 							<div class="inner">
-							  <h3>150</h3>
-							  <p>Total Groups</p>
+							  <h3><?=$employeeCount?></h3>
+							  <p>Number of Employees</p>
 							</div>
 						  </div>
 					</div>
@@ -97,8 +100,6 @@
 				</div>
 			</div>
 		</div>
-		 
-		<?php $this->load->view('includes/right_sidebar');?> 
 	</div>
 </div>
 <link rel="stylesheet" href="<?php echo base_url() ?>assets/frontend/fullcalendar/fullcalendar.min.css" />

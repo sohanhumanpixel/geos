@@ -1,7 +1,7 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
-		<div class="col-md-9">
+		<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -44,12 +44,12 @@
                       <td><?php echo html_entity_decode($announcement->message) ?></td>
                       <td><?php echo $announcement->fname.' '.$announcement->lname ?></td>
                       <td class="text-center">
-                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Announcement/editann/'.base64_encode(convert_uuencode($announcement->id)); ?>"><i class="glyphicon  glyphicon-pencil"></i></a>
-                          <a class="btn btn-sm btn-danger deleteUser" href="<?php echo base_url().'Announcement/delann/'.base64_encode(convert_uuencode($announcement->id)); ?>" data-userid="<?php echo $announcement->id; ?>"><i class="glyphicon  glyphicon-trash"></i></a>
+                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Announcement/editann/'.base64_encode(convert_uuencode($announcement->id)); ?>" data-toggle="tooltip" title="Edit"><i class="glyphicon  glyphicon-pencil"></i></a>
+                          <a class="btn btn-sm btn-danger deleteUser" href="<?php echo base_url().'Announcement/delann/'.base64_encode(convert_uuencode($announcement->id)); ?>" data-toggle="tooltip" title="Delete" data-userid="<?php echo $announcement->id; ?>"><i class="glyphicon  glyphicon-trash"></i></a>
                           <?php if($announcement->active==0){ ?>
-                              <a class="btn btn-sm btn-success" href="<?php echo base_url().'Announcement/statusActive/'.base64_encode(convert_uuencode($announcement->id)); ?>" data-userid="<?php echo $announcement->id; ?>">Active</a>
+                              <a class="btn btn-sm btn-success" href="<?php echo base_url().'Announcement/statusActive/'.base64_encode(convert_uuencode($announcement->id)); ?>" data-toggle="tooltip" title="Currently Inactive" data-userid="<?php echo $announcement->id; ?>">Active</a>
                           <?php }else{ ?>
-                              <a class="btn btn-sm btn-danger" href="<?php echo base_url().'Announcement/statusInactive/'.base64_encode(convert_uuencode($announcement->id)); ?>" data-userid="<?php echo $announcement->id; ?>">Inactive</a>
+                              <a class="btn btn-sm btn-danger" href="<?php echo base_url().'Announcement/statusInactive/'.base64_encode(convert_uuencode($announcement->id)); ?>" data-toggle="tooltip" title="Currently active" data-userid="<?php echo $announcement->id; ?>">Inactive</a>
                           <?php } ?>
                           
                       </td>

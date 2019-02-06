@@ -1,25 +1,29 @@
 .login_margin_top {
-    margin-top: 8%;
-    width: 74%;
-    float: left;
-}
-.login-wrapper {
+    margin: auto;
+    width: 35%;
     position: absolute;
+    top: 10%;
     left: 0;
     right: 0;
+    bottom: 0;
+}
+.login-wrapper {
     text-align: center;
 }
 .navbar {
     margin-bottom: 0;
-    background-color: #0856A2;
-    z-index: 9999;
+    background-color: #fff;
     border: 0;
-    font-size: 14px !important;
-    line-height: 1.42857143 !important;
-    letter-spacing: 4px;
-    border-radius: 0;
-    font-family: Montserrat, sans-serif;
-	height:60px;
+}
+.navbar-brand-centered {
+    position: absolute;
+    left: 40%;
+    display: block;
+    width: 160px;
+    text-align: center;
+}
+.navbar>.container-fluid .navbar-brand-centered {
+    margin-left: -80px;
 }
 .header {
 	margin-bottom: 0;
@@ -33,7 +37,7 @@
     font-family: Montserrat, sans-serif;
 }
 
-.login-wrapper .box {
+/*.login-wrapper .box {
   margin: 0 auto;
   padding: 10px 0 10px;
   float: none;
@@ -48,10 +52,10 @@
   -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
-}
+}*/
 .login-wrapper .box .content-wrap {
   width: 90%;
-  margin: 0 auto;
+  margin: 30px auto;
 }
 .login-wrapper .box h6 {
   text-transform: uppercase;
@@ -87,4 +91,85 @@
   font-size: 13px;
   padding: 7px 15px;
   border-radius: 5px;
+}
+@media only screen and (max-width: 767px){
+.login_margin_top {
+    width: 90%;
+	}
+.navbar>.container-fluid .navbar-brand-centered {
+    margin-left: -158px;
+}	
+}
+@media only screen and (max-width: 1023px) and (min-width: 768px){
+.login_margin_top {
+    width: 60%;
+	}
+	}
+	
+	
+/*
+*Css added on new design template
+*Date: 05-Feb-19;
+*/
+input.form-control.c-input {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0 !important;
+}
+input.form-control.c-input:focus {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+.input-group.c-group {
+    border-bottom: 1px solid #8291a4;
+}
+.login-wrapper .form-group.c-link a {
+    float: right;
+}
+.login-wrapper .form-group a:hover {
+    text-decoration: none;
+}
+.login-wrapper .form-group.c-link{
+    font-size: 15px;
+    font-weight: 600;
+    margin: 10px 0;
+}
+button.btn.btn-large.c-button {
+    width: 100%;
+    margin: 10px 0;
+    background: none;
+    border: 1px solid #ea9386;
+    box-shadow: 0px 0px 1px #ea9386;
+    padding: 10px;
+    color: #e05b47;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+button.btn.btn-large.c-button {
+    outline: none;
+}
+.form-group.c-bottom-link {
+    margin: 30px 0;
+    color: #797979;
+    font-size: 15px;
+}
+.form-group.c-bottom-link a {
+    font-weight: 600;
+    color: #145ba2;
+}
+.c-logo img {
+    width: 55%;
+    margin: 30px;
+}
+.c-group .input-group-addon {
+    font-size: 27px;
+    color: #145ba2;
+    background: none;
+    border: none;
+}
+.login_margin_top .form-group{
+  margin-bottom: 30px;
 }

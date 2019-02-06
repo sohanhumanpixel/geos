@@ -33,6 +33,8 @@ Class Leave extends BaseController {
 		$returns = $this->paginationCompress ( "Leave/leavelist/", $count, 10 );
 		$data['leaveRecords'] = $this->LeaveModel->leaveListing($returns["page"], $returns["segment"],$this->vendorId);
 		$data['title'] = 'Leave List';
+		$this->load->model('users');
+		$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 		$this->load->view('includes/header',$data);
 		$this->load->view('leave/leave_list');
 	}
@@ -49,6 +51,8 @@ Class Leave extends BaseController {
 		//Get Type
 		$data['title'] = 'Leave Request';
 		$this->load->model('LeaveModel');
+		$this->load->model('users');
+		$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 		$data['leaveType'] = $this->LeaveModel->getLeaveType();
 		$this->load->view('includes/header',$data);
 		$this->load->view('leave/leave_request');
@@ -85,6 +89,7 @@ Class Leave extends BaseController {
                 $join_date =  date('Y-m-d',strtotime($leave_to_date . ' +1 day'));
 				
 				$no_of_days = round((strtotime($leave_to_date)- strtotime($leave_from_date))/(60 * 60 * 24));
+				$no_of_days = $no_of_days + 1;
 				
                 $userInfo = array('leave_type'=>$leave_type, 'leave_from_date'=>$leave_from_date, 'leave_to_date'=>$leave_to_date, 'leave_reason'=> $leave_reason,'no_of_days'=> $no_of_days,'join_date'=>$join_date, 'emp_id'=>$this->vendorId, 'leave_requested_date'=>date('Y-m-d H:i:s'));
 				
@@ -113,6 +118,8 @@ Class Leave extends BaseController {
 	    	$editLeaveD = $this->LeaveModel->getLeaveById(convert_uudecode(base64_decode($id)));
 	    	$data['leaveType'] = $this->LeaveModel->getLeaveType();
 	    	$data['editLeaveData'] = $editLeaveD;
+	    	$this->load->model('users');
+		$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 	    	$this->load->view('includes/header',$data);
 	    	$this->load->view('leave/edit_leave');
 	}
@@ -145,7 +152,7 @@ Class Leave extends BaseController {
 			$join_date =  date('Y-m-d',strtotime($leave_to_date . ' +1 day'));
 			
 			$no_of_days = round((strtotime($leave_to_date)- strtotime($leave_from_date))/(60 * 60 * 24));
-			
+			$no_of_days = $no_of_days + 1;
 			$LeaveInfo = array('leave_type'=>$leave_type, 'leave_from_date'=>$leave_from_date, 'leave_to_date'=>$leave_to_date, 'leave_reason'=> $leave_reason,'no_of_days'=> $no_of_days,'join_date'=>$join_date, 'updated_at'=>date('Y-m-d H:i:s'));
 			
 			$result = $this->LeaveModel->editLeaveRequest($LeaveInfo,convert_uudecode(base64_decode($id)));
@@ -182,6 +189,8 @@ Class Leave extends BaseController {
 		$returns = $this->paginationCompress ( "Leave/leavecomingup/", $count, 10 );
 		$data['leaveRecords'] = $this->LeaveModel->UpcommingLeaveListing($returns["page"], $returns["segment"],$loginEmpId,$startDate);
 		$data['title'] = 'Leave List';
+		$this->load->model('users');
+		$data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 		$this->load->view('includes/header',$data);
 		$this->load->view('leave/upcomming_leave');
 	}

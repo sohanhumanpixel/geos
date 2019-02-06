@@ -184,7 +184,7 @@ class Users extends CI_Model {
     }
 	
 	function getCurrentUser($id){
-        $this->db->select('BaseTbl.id as userId, BaseTbl.email, BaseTbl.construction_card, BaseTbl.fname, BaseTbl.lname, BaseTbl.username, Role.role_name');
+        $this->db->select('BaseTbl.id as userId, BaseTbl.email, BaseTbl.construction_card, BaseTbl.fname, BaseTbl.lname, BaseTbl.username, BaseTbl.image, Role.role_name');
         $this->db->from('users as BaseTbl');
         $this->db->join('user_roles as Role', 'Role.id = BaseTbl.role_id','left');
         $this->db->where('BaseTbl.isDeleted', 0);
@@ -256,16 +256,7 @@ class Users extends CI_Model {
         return $query->result_array();
 	}
 	
-	/**
-	 *@get All Skills
-	 */
-	 
-	 function getAllSkills(){
-		$this->db->select('*');
-        $this->db->from('skills');
-        $query = $this->db->get();
-        return $query->result();
-	 }
+	
 	 
 	 /**
 	  *Update user Profile Pic
@@ -276,6 +267,149 @@ class Users extends CI_Model {
         $this->db->update('users', $filename);
         return $this->db->affected_rows();
 	  }
-
+    
+    function employeeCount()
+    {
+        $this->db->select('*');
+        $this->db->from('users');
+        $query = $this->db->get();
+        
+        return count($query->result());
+    }
+    function getAllEmployee()
+    {
+      $this->db->select('*');
+      $this->db->from('users');
+      $query = $this->db->get();
+        
+      return $query->result();
+    }
+    function saveExludedProjects($data)
+    {
+      $this->db->insert('excluded_projects', $data);
+        
+      $insert_id = $this->db->insert_id();
+        
+      return $insert_id;
+    }
+    function getExcludedProjects()
+    {
+      $this->db->select('ep.*,u.fname,u.lname');
+      $this->db->from('excluded_projects as ep');
+      $this->db->join('users as u', 'ep.employee_id = u.id');
+      $query = $this->db->get();
+        
+      $result = $query->result();        
+      return $result;
+    }
+    function deleteExcludedProjects($id)
+    {
+      $this->db->where('id', $id);
+      $this->db->delete('excluded_projects');
+      return true;
+    }
+    function editExcludedProjects($id)
+    {
+      $this->db->select('ep.*,c.company_name');
+      $this->db->from('excluded_projects as ep');
+      $this->db->join('companies as c', 'ep.client_id = c.id');
+      $this->db->where('ep.id', $id);
+      $query = $this->db->get();
+        
+      $result = $query->result();        
+      return $result;
+    }
+    function updateExludedProjects($data,$id)
+    {
+      $this->db->where('id', $id);
+      $this->db->update('excluded_projects', $data);
+      return true;
+    }
+    function checkForExcludedProjectEntry($emp_id)
+    {
+      $this->db->select('id');
+      $this->db->from('excluded_projects');
+      $this->db->where('employee_id', $emp_id);
+      $query = $this->db->get();
+        
+      return $query->result();
+    }
+    function getAllSkills()
+    {
+      $this->db->select('s.id,s.skill_name,s.created_at,u.fname,u.lname');
+      $this->db->from('skills as s');
+      $this->db->join('users as u', 's.created_by = u.id');
+      $query = $this->db->get();
+        
+      return $query->result();
+    }
+    function addNewSkill($data)
+    {
+      $this->db->insert('skills', $data);
+        
+      $insert_id = $this->db->insert_id();
+        
+      return $insert_id;
+    }
+    function getSkillById($id)
+    {
+      $this->db->select('id,skill_name');
+      $this->db->from('skills');
+      $this->db->where('id',$id);
+      $query = $this->db->get();
+        
+      $result = $query->result();        
+      return $result;
+    }
+    function editSkill($data,$id)
+    {
+      $this->db->where('id', $id);
+      $u = $this->db->update('skills', $data);
+      return $u;
+    }
+    function deleteSkill($id)
+    {
+      $this->db->where('id', $id);
+      $this->db->delete('skills');
+      return true;
+    }
+    function postTaskComment($data)
+    {
+      $this->db->insert('comments_tasks', $data);
+        
+      $insert_id = $this->db->insert_id();
+        
+      return $insert_id;
+    }
+    function postProjTaskComment($data)
+    {
+      $this->db->insert('comments_project_tasks', $data);
+        
+      $insert_id = $this->db->insert_id();
+        
+      return $insert_id;
+    }
+    function insertTaskPhoto($data){
+      $this->db->insert('photos_tasks', $data);
+        
+      $insert_id = $this->db->insert_id();
+        
+      return $insert_id;
+    }
+    function insertProjTaskPhoto($data){
+      $this->db->insert('photos_project_tasks', $data);
+        
+      $insert_id = $this->db->insert_id();
+        
+      return $insert_id;
+    }
+    function getAllLiveUsers($k){
+        $this->db->select("id, CONCAT(fname,' ',lname) as fullname");
+        $this->db->from('users');
+        $this->db->where("isDeleted", 0);
+        $this->db->where("fname LIKE '%$k%' OR lname LIKE '%$k%'");
+        $query = $this->db->get();
+        return $query->result();
+    }
 }
 ?>

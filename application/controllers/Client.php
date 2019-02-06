@@ -2,8 +2,7 @@
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 require APPPATH . '/libraries/BaseController.php';
 /**
- * User Controller
- * @purpose: user module integration
+ * Client Controller
  */
 Class Client extends BaseController {
     public function __construct() {
@@ -22,12 +21,14 @@ Class Client extends BaseController {
             $this->loadThis();
         }else{
 		    $this->load->model('clients');
+            $this->load->model('users');
+            $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
             $this->load->library('pagination');
             $searchText = '';
             $count = $this->clients->ClientCount($searchText);
             $returns = $this->paginationCompress ( "Client", $count, 10 );
             $data['clients'] = $this->clients->getClients($searchText, $returns["page"], $returns["segment"]);
-			$data['title'] = 'Clients';
+			$data['title'] = 'Contacts';
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/client');
         }
@@ -39,7 +40,11 @@ Class Client extends BaseController {
             $this->loadThis();
         }else
         {
-        	$data['title'] = 'Add New Client';
+            $this->load->model('companies');
+            $this->load->model('users');
+            $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
+            $data['companies'] = $this->companies->getAllCompanies();
+        	$data['title'] = 'Add New Contact';
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/add_client');
         }
@@ -56,6 +61,7 @@ Class Client extends BaseController {
 			$this->form_validation->set_rules('lname','Last name','trim|required|max_length[128]');
             $this->form_validation->set_rules('email','Email','trim|required|valid_email|max_length[128]');
             $this->form_validation->set_rules('phone','Phone','trim|required|regex_match[/^[0-9]{10}$/]');
+            $this->form_validation->set_rules('company','Company','trim|required');
             if($this->form_validation->run() == FALSE)
             {
                 $this->add();
@@ -66,7 +72,9 @@ Class Client extends BaseController {
 				$lname = ucwords(strtolower($this->input->post('lname')));
                 $email = $this->input->post('email');
                 $phone = $this->input->post('phone');
-                $clientInfo = array('email'=>$email, 'fname'=> $fname,'lname'=> $lname, 'phone'=>$phone, 'created_by'=>$this->vendorId, 'created_at'=>date('Y-m-d H:i:s'));
+                $notes = $this->input->post('notes');
+                $company = $this->input->post('company');
+                $clientInfo = array('email'=>$email, 'fname'=> $fname,'lname'=> $lname, 'phone'=>$phone, 'company'=>$company, 'notes'=>$notes, 'created_by'=>$this->vendorId, 'created_at'=>date('Y-m-d H:i:s'));
                 
                 $this->load->model('clients');
                 $result = $this->clients->addNewClient($clientInfo);
@@ -98,8 +106,12 @@ Class Client extends BaseController {
 			if(empty($clientdata)){
 				  redirect('client');
 			}
+            $this->load->model('companies');
+            $data['companies'] = $this->companies->getAllCompanies();
 			$data['clientInfo'] = $clientdata;
-			$data['title'] = 'Edit Client';
+			$data['title'] = 'Edit Contact';
+            $this->load->model('users');
+            $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/edit_client');
 		}
@@ -123,7 +135,8 @@ Class Client extends BaseController {
 			$this->form_validation->set_rules('lname','Last name','trim|required|max_length[128]');
             $this->form_validation->set_rules('email','Email','trim|required|valid_email|max_length[128]');
             $this->form_validation->set_rules('phone','Phone','required|regex_match[/^[0-9]{10}$/]');
-            
+            $this->form_validation->set_rules('company','Company','trim|required');
+
             if($this->form_validation->run() == FALSE)
             {
                 $this->edit(base64_encode(convert_uuencode($clientId)));
@@ -136,8 +149,10 @@ Class Client extends BaseController {
 				$lname = ucwords(strtolower($this->input->post('lname')));
                 $email = $this->input->post('email');
                 $phone = $this->input->post('phone');
+                $notes = $this->input->post('notes');
+                $company = $this->input->post('company');
                 $clientInfo = array('email'=>$email,
-                        'fname'=> $fname,'lname'=> $lname,'phone'=>$phone, 'updated_by'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
+                        'fname'=> $fname,'lname'=> $lname,'phone'=>$phone,'company'=>$company,'notes'=>$notes, 'updated_by'=>$this->vendorId, 'updated_at'=>date('Y-m-d H:i:s'));
                 
                 
                 $result = $this->clients->editClient($clientInfo, $clientId);
@@ -189,6 +204,27 @@ Class Client extends BaseController {
 			   }else{
 				   echo(json_encode(array('status'=>FALSE))); 
 				}
+        }
+    }
+    public function Detail($clientId){
+        if($this->isTicketter() == TRUE)
+        {
+            $this->loadThis();
+            
+        }else{
+            if($clientId == null)
+            {
+                redirect('Client');
+            }
+            $this->load->model('clients');
+            $this->load->model('users');
+            $data['title'] = 'Client Details';
+            
+            $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
+            $cleintData = $this->clients->getClientById($clientId);
+            $data['clientInfo'] = $cleintData;
+            $this->load->view('includes/header',$data);
+            $this->load->view('admin/client_details');
         }
     }
 }

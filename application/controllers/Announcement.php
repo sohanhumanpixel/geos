@@ -28,6 +28,8 @@ Class Announcement extends BaseController {
             $count = $this->announcements->AnnouncementCount($searchText);
             $returns = $this->paginationCompress ( "Announcement", $count, 10 );
             $data['announcements'] = $this->announcements->getAnnouncements($searchText, $returns["page"], $returns["segment"]);
+            $this->load->model('users');
+            $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 			$data['title'] = 'Announcements';
 			$this->load->view('includes/header',$data);
 			$this->load->view('admin/announcement');
@@ -39,6 +41,8 @@ Class Announcement extends BaseController {
             $this->loadThis();
         }else{
     		$data['title'] = "Add New Announcement";
+            $this->load->model('users');
+            $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
     		$this->load->view('includes/header',$data);
     		$this->load->view('admin/add_announcement');
         }
@@ -101,6 +105,8 @@ Class Announcement extends BaseController {
 	    	$this->load->model('announcements');
 	    	$announcement = $this->announcements->getAnnouncementsById(convert_uudecode(base64_decode($id)));
 	    	$data['announcement'] = $announcement;
+            $this->load->model('users');
+            $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 	    	$this->load->view('includes/header',$data);
 	    	$this->load->view('admin/edit_announcement');
 	    }

@@ -1,14 +1,14 @@
 <div class="page-content">
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
-		<div class="col-md-9">
+		<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
 						<h3><?=$title?></h3>
 					</div>
 					<div class="panel-options">
-					  <a href="<?php echo base_url(); ?>Client/add" class="btn btn-success">Add New Client</a>
+					  <a href="<?php echo base_url(); ?>Client/add" class="btn btn-success">Add New Contact</a>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -26,10 +26,10 @@
 						<table class="table user-list">
 							<thead>
 								<tr>
-								<th><span>First Name</span></th>
-								<th><span>Last Name</span></th>
+								<th><span>Name</span></th>
 								<th><span>Email</span></th>
 								<th><span>Phone</span></th>
+								<th><span>Company</span></th>
 								<th><span>Created By</span></th>
 								<th>Action</th>
 								</tr>
@@ -43,14 +43,15 @@
                         {
                     ?>	
 					<tr>
-                      <td><?php echo $client->fname ?></td>
-                      <td><?php echo $client->lname ?></td>
+                      <td><a href="<?=base_url()?>Client/Detail/<?=$client->id?>"><?php echo $client->fname ?> <?php echo $client->lname ?></a></td>
                       <td><?php echo $client->email ?></td>
 					  <td><?php echo $client->phone ?></td>
+					  <td><?php echo $client->company_name ?></td>
                       <td><?php echo $client->firstname.' '.$client->lastname ?></td>
-                      <td class="text-center">
-                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Client/edit/'.base64_encode(convert_uuencode($client->id)); ?>"><i class="glyphicon  glyphicon-pencil"></i></a>
-                          <a class="btn btn-sm btn-danger deleteClient" href="javaScript:void(0);" data-userid="<?php echo $client->id; ?>"><i class="glyphicon  glyphicon-trash"></i></a>
+                      <td class="text-center">	
+                      	  <a class="btn btn-sm btn-success" href="<?php echo base_url().'Client/Detail/'.$client->id; ?>" data-toggle="tooltip" title="View"><i class="glyphicon glyphicon-eye-open"></i></a>
+                          <a class="btn btn-sm btn-info" href="<?php echo base_url().'Client/edit/'.base64_encode(convert_uuencode($client->id)); ?>" data-toggle="tooltip" title="Edit"><i class="glyphicon  glyphicon-pencil"></i></a>
+                          <a class="btn btn-sm btn-danger deleteClient" href="javaScript:void(0);" data-userid="<?php echo $client->id; ?>" data-toggle="tooltip" title="Delete"><i class="glyphicon  glyphicon-trash"></i></a>
                       </td>
                     </tr>
 					<?php 

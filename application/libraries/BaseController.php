@@ -81,9 +81,10 @@ class BaseController extends CI_Controller {
 	/**
 	 * This function is used to load the set of views
 	 */
-	function loadThis() {
+	function loadThis($currentU = array()) {
 		$this->global ['title'] = 'Access Denied';
-		
+		$this->load->model('users');
+		$this->global ['currentUser'] = $this->users->getCurrentUser($this->vendorId);
 		$this->load->view ( 'includes/header', $this->global );
 		$this->load->view ( 'access' );
 		//$this->load->view ( 'includes/footer' );

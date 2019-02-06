@@ -2,7 +2,7 @@
 	<div class="row">
 	<?php $this->load->view('includes/left_sidebar');?>
 	
-	<div class="col-md-9">
+	<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -20,7 +20,14 @@
 								<label>Group Name<em>*</em></label>
 								<input class="form-control" name="group_name" id="group_name" placeholder="Enter Group name" type="text">
 							</div>
-							
+							<div class="form-group">
+								<label>Select Employees<em>*</em></label>
+								<select name="group_emp[]" class="form-control group_emp" data-placeholder="Select Employees" multiple>
+									<?php foreach($allEmployees as $employee){ ?>
+										<option value="<?=$employee->id?>"><?=$employee->fname.' '.$employee->lname?></option>
+									<?php } ?>
+								</select>
+							</div>
 						</fieldset>
 						<div class="box-footer">
                             <input type="submit" class="btn btn-success" value="Submit" />
@@ -55,19 +62,25 @@
 	</div>
 </div>
 <?php $this->load->view('includes/footer');?> 
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/frontend/chosen/chosen.css">
 <script src="<?php echo base_url(); ?>assets/frontend/js/jquery.validate.min.js" type="text/javascript"></script>
+<script src="<?php echo base_url(); ?>assets/frontend/chosen/chosen.jquery.js" type="text/javascript"></script>
 <script>
 $(document).ready(function(){
 	$( "#addGroup" ).validate({
-				rules: {
-				group_name: {
-  					required: true
-  				},
-				},
-				messages: {
-					group_name: "Please enter group name",
-
-			  }
-			});
+		rules: {
+			"group_name": {
+				required: true
+			},
+			"group_emp[]": {
+				required: true
+			},
+		},
+		messages: {
+			"group_name": "Please enter group name",
+			"group_emp[]" : "Please select employees",
+        }
+	});
+	$(".group_emp").chosen();
 });
 </script>

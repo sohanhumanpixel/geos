@@ -4,7 +4,7 @@
 	$this->load->view('includes/left_sidebar');
 	?>
 	
-	<div class="col-md-9">
+	<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
@@ -35,7 +35,21 @@
 								<label>Phone<em>*</em></label>
 						<input class="form-control" name="phone" id="phone" placeholder="Enter Phone" type="text" value="<?php echo $clientInfo[0]->phone; ?>" />
 							</div>
-							
+							<div class="form-group">
+								<label>Company<em>*</em></label>
+								<select name="company" class="form-control">
+									<option value="">Select Company</option>
+									<?php if(!empty($companies)){
+										foreach($companies as $company){ ?>
+                                        <option value="<?=$company->id?>" <?php if($clientInfo[0]->company==$company->id){ echo "selected"; } ?>><?=$company->company_name?></option>
+										<?php }
+									} ?>
+								</select>
+							</div>
+							<div class="form-group">
+								<label>Notes</label>
+								<textarea id="notes" name="notes" rows="8" class="form-control"><?=$clientInfo[0]->notes?></textarea>
+							</div>
 						</fieldset>
 						
 						<div class="box-footer">
@@ -73,3 +87,11 @@
 <?php $this->load->view('includes/footer');?> 
 <script src="<?php echo base_url(); ?>assets/frontend/js/jquery.validate.min.js" type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>assets/frontend/js/editClient.js" type="text/javascript"></script>
+<script src="<?=base_url('assets/vendor/summernote/summernote.js')?>"></script>
+<script>
+$(document).ready(function() {
+  $('textarea').summernote({
+	  height: 200
+  });
+});
+</script>

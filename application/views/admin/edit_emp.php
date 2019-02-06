@@ -10,14 +10,14 @@
 	}
 	?>
 	
-	<div class="col-md-9">
+	<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
-						<h3>Add New User</h3>
+						<h3>Edit User</h3>
 					</div>
 					<div class="panel-options">
-					  <a href="<?php echo base_url() ?>employee_list" class="btn btn-success">Go Back</a>
+					  <a href="<?php echo $referred_from; ?>" class="btn btn-success">Go Back</a>
 					</div>
 				</div>
 				<div class="panel-body">

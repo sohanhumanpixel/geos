@@ -2,7 +2,7 @@
 	<div class="row">
 	<?php $this->load->view('includes/left_sidebar');?>
 	
-	<div class="col-md-9">
+	<div class="col-md-10 padding-left-right">
 			<div class="content-box-large">
 				<div class="panel-heading">
 					<div class="panel-title">
