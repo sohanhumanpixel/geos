@@ -34,9 +34,9 @@
                     </div>
                     <div class="col-md-6">
                         <div class="profile-head">
-                                    <h5>
+                                    <h3>
                                         <?php echo $userData[0]->fname.' '.$userData[0]->lname; ?>
-                                    </h5>
+                                    </h3>
                                     
                             <ul class="nav nav-tabs" id="myTab" role="tablist">
                                 <li class="nav-item active">
@@ -95,6 +95,14 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <p><?php echo $userData[0]->role_name; ?></p>
+                                            </div>
+                                        </div> 
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Group</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><?php echo $userData[0]->group_name; ?></p>
                                             </div>
                                         </div> 
                                         <div class="row">

@@ -2,18 +2,19 @@
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
 		<div class="col-md-10 padding-left-right">
-		    <div class="page-panel-title">
-				<div class="panel-title">
-						<h3>Employee List</h3>
+				
+				<div class="page-panel-title">
+				 <div class="panel-heading">
+					<div class="panel-title">
+						<h2>Employee List</h2>
 					</div>
 					<div class="panel-options">
-					  <a href="<?php echo base_url(); ?>addNewEmployee" class="btn btn-success">Add New User</a>
+					  <a href="<?php echo base_url(); ?>addNewEmployee" class="btn btn-success add_new_btn button_color"><span> <i class="fa fa-plus" aria-hidden="true"></i> </span> ADD NEW</a>
 					</div>
-			</div>		
+				</div>	
+			</div>			
 			<div class="content-box-large">
-				<div class="panel-heading">
-				</div>
-				<div class="panel-body">
+				<div class="panel-body padding-top-zero">
 					<div class="table-responsive">
 					<?php  
                     $success = $this->session->flashdata('success');

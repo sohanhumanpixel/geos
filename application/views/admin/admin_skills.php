@@ -2,16 +2,18 @@
 	<div class="row">
 		<?php $this->load->view('includes/left_sidebar');?> 
 		<div class="col-md-10 padding-left-right">
-			<div class="content-box-large">
+		    <div class="page-panel-title">
 				<div class="panel-heading">
 					<div class="panel-title">
 						<h3><?=$title?></h3>
 					</div>
 					<div class="panel-options">
-					  <a href="<?php echo base_url(); ?>Employee/addSkill" class="btn btn-success">Add New Skill</a>
+					  <a href="<?php echo base_url(); ?>Employee/addSkill" class="btn btn-success  button_color"> <span> <i class="fa fa-plus" aria-hidden="true"></i> </span> Add New Skill</a>
 					</div>
-				</div>
-				<div class="panel-body">
+				</div> 
+			</div>	
+			<div class="content-box-large">
+				<div class="panel-body padding-top-zero">
 					<div class="table-responsive">
 					<?php  
                     $success = $this->session->flashdata('success');

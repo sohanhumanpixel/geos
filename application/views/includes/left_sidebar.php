@@ -210,6 +210,12 @@
 			<li class=""><a href="#"><i class="fa fa-clock-o"></i>Add Time Sheet</a></li>
 		 </ul>
 		</li>
+		
+		<li class="treeview">
+			<div class="humanpixel_logo">	
+			<a href="https://humanpixel.com.au" target="_blank"><img src="https://humanpixel.com.au/wp-content/uploads/2018/07/lovinglycraftedby-grey.png" width="150px"></a>
+			</div>
+		</li>
       </ul>
     </section>
     <!-- /.sidebar -->
@@ -291,7 +297,8 @@
           <ul class="treeview-menu">
             <li class=""><a href="<?php echo base_url() ?>TimeSheet/listtimesheet"><i class="fa fa-circle-o"></i>Timesheet</a></li>
           </ul>
-        </li>
+        </li>		
+	    	
       </ul>
     </section>
   </aside>

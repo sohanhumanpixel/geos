@@ -3,16 +3,19 @@
 	<?php $this->load->view('includes/left_sidebar');?>
 	
 	<div class="col-md-10 padding-left-right">
-			<div class="content-box-large">
+			<div class="page-panel-title">
 				<div class="panel-heading">
 					<div class="panel-title">
 						<h3>Add New User</h3>
 					</div>
 					<div class="panel-options">
-					  <a href="employee_list" class="btn btn-success">Go Back</a>
+					  <a href="employee_list" class="btn btn-success button_color">Go Back</a>
 					</div>
 				</div>
-				<div class="panel-body">
+			</div>
+			<div class="content-box-large">
+				
+				<div class="panel-body padding-top-zero">
 					<div class='col-md-9'>
 					<form action="<?php echo base_url() ?>Admin/addNewUser" name="addUser" id="addUser" method="post" enctype="multipart/form-data">
 						<fieldset>
@@ -89,7 +92,7 @@
 						</fieldset>
 						
 						<div class="box-footer">
-                            <input type="submit" class="btn btn-success" value="Submit" />
+                            <input type="submit" class="btn btn-success button_color" value="Submit" />
                             <input type="reset" class="btn btn-default" value="Reset" />
                         </div>
 					</form>
