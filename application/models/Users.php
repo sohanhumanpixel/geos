@@ -38,9 +38,8 @@ class Users extends CI_Model {
             $this->db->where($likeCriteria);
         }
         $this->db->where('BaseTbl.isDeleted', 0);
-        $this->db->where('BaseTbl.role_id !=', 1);
+        //$this->db->where('BaseTbl.role_id !=', 1);
         $query = $this->db->get();
-        
         return count($query->result());
     }
 	
@@ -217,9 +216,11 @@ class Users extends CI_Model {
 	 
 	public function userProfileData($empid){
 		$arraydata = array();
-		$this->db->select('UserTbl.id as userId, UserTbl.email, UserTbl.fname, UserTbl.lname, UserTbl.username,UserTbl.address,UserTbl.image, UserTbl.contact_phone, UserTbl.construction_card, Role.role_name');
+		$this->db->select('UserTbl.id as userId, UserTbl.email, UserTbl.fname, UserTbl.lname, UserTbl.username,UserTbl.address,UserTbl.image, UserTbl.contact_phone, UserTbl.construction_card, Role.role_name, g.group_name');
         $this->db->from('users as UserTbl');
         $this->db->join('user_roles as Role', 'Role.id = UserTbl.role_id','left');
+        $this->db->join('user_groups as Group', 'Group.user_id = UserTbl.id','left');
+        $this->db->join('groups as g', 'g.id = Group.group_id','left');
         $this->db->where('UserTbl.isDeleted', 0);
         $this->db->where('UserTbl.id', $empid);
         $query = $this->db->get();
@@ -227,7 +228,6 @@ class Users extends CI_Model {
 		$skillsData = $this->getUserSkill($empid);
 		$arraydata['userdata'] = $result;
 		$arraydata['Userskills'] = $skillsData;
-		
 		return $arraydata;
 	}
 	
@@ -272,6 +272,7 @@ class Users extends CI_Model {
     {
         $this->db->select('*');
         $this->db->from('users');
+        $this->db->where('isDeleted', 0);
         $query = $this->db->get();
         
         return count($query->result());
@@ -280,6 +281,7 @@ class Users extends CI_Model {
     {
       $this->db->select('*');
       $this->db->from('users');
+      $this->db->where('isDeleted', 0);
       $query = $this->db->get();
         
       return $query->result();
