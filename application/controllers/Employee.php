@@ -75,6 +75,7 @@ Class Employee extends BaseController {
   $data['currentUser'] = $this->users->getCurrentUser($this->vendorId);
   $projectdata = $this->project_type->getProjectById($projectId);
   $data['projectInfo'] = $projectdata;
+  $data['project_id'] = $projectId;
   $data['tasks'] =$this->project_type->getTasksProject($projectId);
   $data['backUrl'] = base_url('Employee/projectList');
   $data['adminAccess'] = 'false';
